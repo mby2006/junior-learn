@@ -1,0 +1,47 @@
+# 依赖目录
+node_modules/
+vendor/
+venv/
+.venv/
+
+# 构建产物
+dist/
+build/
+*.exe
+__pycache__/
+*.pyc
+
+# IDE 和编辑器
+.idea/
+.vscode/
+*.swp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# 日志和临时文件
+*.log
+tmp/
+
+# MCP 插件缓存
+.playwright-mcp/
+
+# 数据库文件（按需）
+*.db
+*.sqlite
+
+# 运行时数据
+data/logs/
+data/homework_images/
+data/wrong_book/
+data/history/
+data/question_bank/
+data/user/
+data/user_profile/
+
+# 密钥与本地环境
+.env
+.env.local
+*.pem
+*.key

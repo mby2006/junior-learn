@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>恐龙快跑</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#fff}
+body{display:flex;justify-content:center;align-items:center}
+@supports (height:100dvh){html,body{height:100dvh}}
+#gameCanvas{display:block;max-width:100%;max-height:100%;image-rendering:auto;cursor:pointer}
+</style>
+</head>
+<body>
+<canvas id="gameCanvas"></canvas>
+<script>
+(function(){
+'use strict';
+
+/* ─── 常量 ─── */
+const CW = 1200, CH = 420;
+const FPS = 60, FRAME_MS = 1000 / FPS;
+const GROUND_Y = 335;
+const REVIVE_COST = 1000;
+
+/* ─── Canvas ─── */
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
+ctx.imageSmoothingEnabled = true;
+
+/* ─── 离屏 Canvas（双缓冲，消除闪烁） ─── */
+const offCanvas = document.createElement('canvas');
+offCanvas.width = CW; offCanvas.height = CH;
+const offCtx = offCanvas.getContext('2d');
+offCtx.imageSmoothingEnabled = false;
+
+function resizeCanvas(){
+  var scale = Math.min(window.innerWidth / CW, window.innerHeight / CH);
+  var cssW = Math.max(1, Math.floor(CW * scale));
+  var cssH = Math.max(1, Math.floor(CH * scale));
+  if (window.innerWidth <= 640) {
+    cssW = Math.max(1, window.innerWidth);
+    cssH = Math.min(window.innerHeight, Math.max(cssH, Math.floor(window.innerHeight * 0.62)));
+  }
+  var dpr = window.devicePixelRatio || 1;
+  canvas.style.width = cssW + 'px';
+  canvas.style.height = cssH + 'px';
+  var bw = Math.max(1, Math.round(cssW * dpr));
+  var bh = Math.max(1, Math.round(cssH * dpr));
+  if(canvas.width !== bw || canvas.height !== bh){
+    canvas.width = bw;
+    canvas.height = bh;
+    ctx.imageSmoothingEnabled = true;
+  }
+}
+function commitFrame(){
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(offCanvas, 0, 0, canvas.width, canvas.height);
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+/* ─── 图像管理 ─── */
+function img(name){var i=new Image;i.src='assets/'+name;return i}
+var IMG = {
+  dinoRun:[img('DinoRun1.png'),img('DinoRun2.png')],
+  dinoJump:img('DinoJump.png'),
+  dinoDuck:[img('DinoDuck1.png'),img('DinoDuck2.png')],
+  dinoDead:img('DinoDead.png'),
+  dinoStart:img('DinoStart.png'),
+  smallCactus:[img('SmallCactus1.png'),img('SmallCactus2.png'),img('SmallCactus3.png')],
+  largeCactus:[img('LargeCactus1.png'),img('LargeCactus2.png'),img('LargeCactus3.png')],
+  bird:[img('Bird1.png'),img('Bird2.png')],
+  cloud:img('Cloud.png'),
+  gameOver:img('GameOver.png'),
+  reset:img('Reset.png'),
+  track:img('Track.png'),
+};
+var allImgs=[];
+Object.keys(IMG).forEach(function(k){
+  if(Array.isArray(IMG[k])){IMG[k].forEach(function(i){allImgs.push(i)})}
+  else{allImgs.push(IMG[k])}
+});
+
+/* ─── 游戏状态 ─── */
+var state = 'loading'; // loading | menu | playing | revive | gameover
+var gameSpeed = 10, points = 0, highestScore = 0, deathCount = 0, reviveCount = 0;
+var xBg = 0; // 背景滚动偏移
+var dino, clouds, obstacles;
+var frameCount = 0, lastTime = 0, accumulator = 0;
+var imagesReady = false;
+var keysDown = {};
+var sentGameOver = false;
+var hiScore = 0; // 本地最高分
+
+/* ─── 碰撞检测 ─── */
+function rectHit(ax,ay,aw,ah,bx,by,bw,bh){
+  return ax<bx+bw && ax+aw>bx && ay<by+bh && ay+ah>by;
+}
+
+/* ─── Dino 类 ─── */
+function Dinosaur(){
+  this.x = 80;
+  this.y = GROUND_Y - IMG.dinoRun[0].height;
+  this.yDuck = GROUND_Y - IMG.dinoDuck[0].height;
+  this.jumpVel = 8.5;
+  this.vel = 8.5;
+  this.gravity = 0.4;
+  this.state = 'run'; // run|jump|duck|dead
+  this.step = 0;
+  this.jumping = false;
+  this.ducking = false;
+  this.image = IMG.dinoRun[0];
+}
+Dinosaur.prototype.getRect = function(){
+  var img = this.image;
+  return {x:this.x, y:this.y, w:img.width, h:img.height};
+};
+Dinosaur.prototype.jump = function(){
+  if(this.state==='jump') return;
+  this.state = 'jump';
+  this.jumping = true;
+  this.vel = this.jumpVel;
+  this.image = IMG.dinoJump;
+};
+Dinosaur.prototype.duck = function(){
+  if(this.state==='jump') return;
+  this.state = 'duck';
+  this.ducking = true;
+  this.y = this.yDuck;
+};
+Dinosaur.prototype.stopDuck = function(){
+  if(this.state!=='duck') return;
+  this.ducking = false;
+  this.state = 'run';
+  this.y = GROUND_Y - this.image.height;
+  this.step = 0;
+};
+Dinosaur.prototype.update = function(){
+  if(this.state==='jump'){
+    this.y -= this.vel * 2;
+    this.vel -= this.gravity;
+    if(this.vel < -this.jumpVel){
+      this.jumping = false;
+      this.state = 'run';
+      this.vel = this.jumpVel;
+      this.y = GROUND_Y - this.image.height;
+      this.step = 0;
+    }
+  }
+  if(this.state==='run'){
+    this.step = (this.step+1) % 10;
+    this.image = IMG.dinoRun[Math.floor(this.step/5)];
+    this.y = GROUND_Y - this.image.height;
+  }
+  if(this.state==='duck'){
+    this.step = (this.step+1) % 10;
+    this.image = IMG.dinoDuck[Math.floor(this.step/5)];
+    this.y = this.yDuck;
+  }
+};
+Dinosaur.prototype.die = function(){
+  this.state = 'dead';
+  this.image = IMG.dinoDead;
+};
+Dinosaur.prototype.draw = function(){
+  var img = this.image;
+  offCtx.drawImage(img, this.x, this.y);
+};
+Dinosaur.prototype.reset = function(){
+  this.image = IMG.dinoRun[0];
+  this.y = GROUND_Y - this.image.height;
+  this.vel = this.jumpVel;
+  this.state = 'run';
+  this.step = 0;
+  this.jumping = false;
+  this.ducking = false;
+};
+
+/* ─── Cloud ─── */
+function Cloud(){
+  this.x = CW + 200 + Math.random()*400;
+  this.y = 18 + Math.random()*45;
+  this.image = IMG.cloud;
+  this.w = this.image.width;
+}
+Cloud.prototype.update = function(){
+  this.x -= gameSpeed * 0.5;
+};
+Cloud.prototype.draw = function(){
+  offCtx.drawImage(this.image, this.x, this.y);
+};
+Cloud.prototype.offScreen = function(){
+  return this.x < -this.w;
+};
+
+/* ─── 障碍物基类 ─── */
+function Obstacle(){}
+Obstacle.prototype.update = function(){
+  this.x -= gameSpeed;
+};
+Obstacle.prototype.draw = function(){
+  offCtx.drawImage(this.image, Math.round(this.x), Math.round(this.y));
+};
+Obstacle.prototype.offScreen = function(){
+  return this.x < -this.w;
+};
+Obstacle.prototype.getRect = function(){
+  return {x:this.x, y:this.y, w:this.w, h:this.h};
+};
+
+/* ─── SmallCactus ─── */
+function SmallCactus(){
+  this.type = Math.floor(Math.random()*3);
+  this.image = IMG.smallCactus[this.type];
+  this.x = CW;
+  this.y = GROUND_Y - this.image.height;
+  this.w = this.image.width;
+  this.h = this.image.height;
+}
+SmallCactus.prototype = Object.create(Obstacle.prototype);
+
+/* ─── LargeCactus ─── */
+function LargeCactus(){
+  this.type = Math.floor(Math.random()*3);
+  this.image = IMG.largeCactus[this.type];
+  this.x = CW;
+  this.y = GROUND_Y - this.image.height;
+  this.w = this.image.width;
+  this.h = this.image.height;
+}
+LargeCactus.prototype = Object.create(Obstacle.prototype);
+
+/* ─── Bird ─── */
+function Bird(){
+  this.image = IMG.bird[0];
+  this.x = CW;
+  this.y = GROUND_Y - 118;
+  this.w = this.image.width;
+  this.h = this.image.height;
+  this.step = 0;
+}
+Bird.prototype = Object.create(Obstacle.prototype);
+Bird.prototype.update = function(){
+  Obstacle.prototype.update.call(this);
+  this.step = (this.step+1) % 20;
+  this.image = IMG.bird[Math.floor(this.step/10)];
+};
+Bird.prototype.draw = function(){
+  var dx = Math.round(this.x + (this.w - this.image.width) / 2);
+  var dy = Math.round(this.y + (this.h - this.image.height) / 2);
+  offCtx.drawImage(this.image, dx, dy);
+};
+
+/* ─── 生成障碍物 ─── */
+function spawnObstacle(){
+  var r = Math.random();
+  if(r < 0.4) return new SmallCactus();
+  if(r < 0.7) return new LargeCactus();
+  return new Bird();
+}
+
+/* ─── 游戏函数 ─── */
+function startGame(){
+  state = 'playing';
+  gameSpeed = 10;
+  points = 0;
+  reviveCount = 0;
+  frameCount = 0;
+  clouds = [new Cloud()];
+  obstacles = [];
+  xBg = 0;
+  sentGameOver = false;
+  dino = new Dinosaur();
+  try{
+    window.parent.postMessage({type:'dinoStarted'},'*');
+  }catch(e){}
+}
+
+function enterRevive(){
+  state = 'revive';
+  dino.die();
+  try{
+    window.parent.postMessage({type:'dinoReviveOffered',score:points,cost:REVIVE_COST},'*');
+  }catch(e){}
+}
+
+function reviveGame(){
+  if(state !== 'revive' || points < REVIVE_COST) return;
+  points -= REVIVE_COST;
+  reviveCount++;
+  obstacles = [];
+  keysDown = {};
+  dino.reset();
+  state = 'playing';
+  try{
+    window.parent.postMessage({type:'dinoRevived',score:points,cost:REVIVE_COST,reviveCount:reviveCount},'*');
+    window.parent.postMessage({type:'dinoScore',score:points},'*');
+  }catch(e){}
+}
+
+function gameOver(){
+  state = 'gameover';
+  dino.die();
+  deathCount++;
+  if(points > highestScore) highestScore = points;
+  try{
+    window.parent.postMessage({type:'dinoGameOver',score:points,hiScore:highestScore},'*');
+  }catch(e){}
+}
+
+/* ─── 更新逻辑 ─── */
+function update(){
+  frameCount++;
+  if(state !== 'playing') return;
+
+  // 积分
+  points++;
+  if(points % 200 === 0) gameSpeed += 0.5;
+  if(frameCount % 10 === 0){
+    try{
+      window.parent.postMessage({type:'dinoScore',score:points},'*');
+    }catch(e){}
+  }
+
+  // 恐龙
+  dino.update();
+  if(keysDown['ArrowDown'] || keysDown['KeyS']){dino.duck()}
+  else{dino.stopDuck()}
+
+  // 云
+  clouds.forEach(function(c){c.update()});
+  if(frameCount % 80 === 0) clouds.push(new Cloud());
+  clouds = clouds.filter(function(c){return !c.offScreen()});
+
+  // 障碍物（预生成：先更新再过滤，滤完后立即补位，避免空白间隙→闪烁）
+  obstacles.forEach(function(o){o.update()});
+  obstacles = obstacles.filter(function(o){return !o.offScreen()});
+  if(frameCount > 30 && obstacles.length === 0){
+    var obs = spawnObstacle();
+    obs.update();  // 立即移动使其进入可见区
+    obstacles.push(obs);
+  }
+
+  // 碰撞检测
+  var dr = dino.getRect();
+  for(var i=0;i<obstacles.length;i++){
+    var or = obstacles[i].getRect();
+    if(rectHit(dr.x,dr.y,dr.w,dr.h, or.x,or.y,or.w,or.h)){
+      if(points >= REVIVE_COST) enterRevive();
+      else gameOver();
+      return;
+    }
+  }
+
+  // 背景滚动
+  xBg -= gameSpeed;
+  var tw = IMG.track.width;
+  if(xBg <= -tw) xBg += tw;
+}
+
+/* ─── 绘制 ─── */
+function draw(){
+  // 全部渲染到离屏 canvas，然后一次拷贝到主 canvas（消除闪烁）
+  offCtx.fillStyle = '#fff';
+  offCtx.fillRect(0, 0, CW, CH);
+
+  if(state === 'loading'){
+    offCtx.fillStyle = '#666';
+    offCtx.font = '16px sans-serif';
+    offCtx.textAlign = 'center';
+    offCtx.fillText('加载中...', CW/2, CH/2);
+    commitFrame();
+    return;
+  }
+
+  // 背景 (tracks)
+  var tw = IMG.track.width;
+  var ty = GROUND_Y;
+  for(var i=-1;i<3;i++){
+    offCtx.drawImage(IMG.track, xBg + i*tw, ty);
+  }
+
+  // 云
+  clouds.forEach(function(c){c.draw()});
+
+  // 障碍物（先绘制，避免被覆盖）
+  obstacles.forEach(function(o){o.draw()});
+
+  // 恐龙
+  if(dino) dino.draw();
+
+  // 积分
+  offCtx.fillStyle = '#333';
+  offCtx.font = 'bold 18px monospace,sans-serif';
+  offCtx.textAlign = 'right';
+  offCtx.fillText('Points: '+points, CW-30, 40);
+
+  // 最高分
+  if(highestScore > 0){
+    offCtx.fillStyle = '#999';
+    offCtx.font = '12px monospace,sans-serif';
+    offCtx.fillText('HI: '+highestScore, CW-30, 58);
+  }
+
+  // 菜单/复活/结束画面
+  if(state === 'menu' || state === 'revive' || state === 'gameover'){
+    offCtx.fillStyle = 'rgba(255,255,255,0.78)';
+    offCtx.fillRect(0,0,CW,CH);
+
+    var cx = CW/2;
+    var cy = CH/2;
+
+    if(state === 'menu'){
+      offCtx.drawImage(IMG.dinoStart, cx-48, cy-50);
+    }
+    if(state === 'gameover'){
+      var goImg = IMG.gameOver;
+      offCtx.drawImage(goImg, cx - goImg.width/2, cy - 58);
+      offCtx.drawImage(IMG.dinoDead, cx-43, cy-12);
+    }
+    if(state === 'revive'){
+      offCtx.drawImage(IMG.dinoDead, cx-43, cy-52);
+    }
+
+    offCtx.fillStyle = '#333';
+    offCtx.font = 'bold 22px sans-serif';
+    offCtx.textAlign = 'center';
+    if(state === 'menu'){
+      offCtx.fillText('恐龙快跑', cx, cy-72);
+      offCtx.font = '15px sans-serif';
+      offCtx.fillText('按 空格/↑ 跳跃 · ↓ 或 S 蹲下', cx, cy+52);
+      offCtx.font = '14px sans-serif';
+      offCtx.fillStyle = '#666';
+      offCtx.fillText('点击或按任意键开始', cx, cy+76);
+    } else if(state === 'revive'){
+      offCtx.fillStyle = '#f59e0b';
+      offCtx.fillText('撞到障碍物了', cx, cy-72);
+      offCtx.font = '15px sans-serif';
+      offCtx.fillText('当前分数 '+points+' · 继续将消耗 '+REVIVE_COST+' 分', cx, cy+28);
+      var bw = 230;
+      var bh = 36;
+      var bx = cx - bw / 2;
+      var by = cy + 44;
+      offCtx.fillStyle = '#4F8CFF';
+      offCtx.fillRect(bx, by, bw, bh);
+      offCtx.strokeStyle = 'rgba(255,255,255,0.75)';
+      offCtx.lineWidth = 2;
+      offCtx.strokeRect(bx + 1, by + 1, bw - 2, bh - 2);
+      offCtx.fillStyle = '#fff';
+      offCtx.font = 'bold 15px sans-serif';
+      offCtx.fillText('消耗 1000 分继续游戏', cx, by + 24);
+      offCtx.fillStyle = '#666';
+      offCtx.font = '13px sans-serif';
+      offCtx.fillText('点击按钮或按空格继续 · R/Esc 放弃', cx, by + 58);
+    } else {
+      offCtx.font = '15px sans-serif';
+      offCtx.fillStyle = '#e55';
+      offCtx.fillText('得分: '+points, cx, cy+58);
+      offCtx.fillStyle = '#666';
+      offCtx.font = '14px sans-serif';
+      offCtx.fillText('点击或按任意键重新开始', cx, cy+82);
+    }
+  }
+
+  // 一次性拷贝到主 canvas
+  commitFrame();
+}
+
+/* ─── 主循环 ─── */
+function gameLoop(timestamp){
+  if(!lastTime) lastTime = timestamp;
+  var delta = timestamp - lastTime;
+  lastTime = timestamp;
+  accumulator += delta;
+
+  while(accumulator >= FRAME_MS){
+    update();
+    accumulator -= FRAME_MS;
+  }
+  draw();
+  requestAnimationFrame(gameLoop);
+}
+
+/* ─── 键盘控制 ─── */
+document.addEventListener('keydown',function(e){
+  if(state === 'loading') return;
+  keysDown[e.code] = true;
+
+  if(e.code==='ArrowUp' || e.code==='Space'){
+    e.preventDefault();
+    if(state==='revive'){reviveGame();return}
+    if(state==='menu' || state==='gameover'){startGame();return}
+    if(state==='playing' && dino){dino.jump()}
+  }
+  if(e.code==='Escape' || e.code==='KeyR'){
+    if(state==='revive'){e.preventDefault();gameOver();return}
+  }
+  if(e.code==='ArrowDown'){
+    e.preventDefault();
+  }
+  if(/^Key/.test(e.code) && (state==='menu'||state==='gameover')){
+    startGame();
+  }
+});
+document.addEventListener('keyup',function(e){
+  keysDown[e.code] = false;
+});
+
+/* ─── 触摸/点击 ─── */
+canvas.addEventListener('click',function(){
+  if(state==='loading') return;
+  if(state==='revive'){reviveGame();return}
+  if(state==='menu' || state==='gameover'){startGame();return}
+  if(state==='playing' && dino){dino.jump()}
+});
+canvas.addEventListener('touchstart',function(e){
+  e.preventDefault();
+  if(state==='loading') return;
+  if(state==='revive'){reviveGame();return}
+  if(state==='menu' || state==='gameover'){startGame();return}
+  if(state==='playing' && dino){dino.jump()}
+});
+
+/* ─── 父页面通信 ─── */
+window.addEventListener('message',function(e){
+  if(e.data && e.data.type==='dinoRestart'){
+    startGame();
+  }
+});
+
+/* ─── 启动：使用 decode() 确保图片完全解码到 GPU ─── */
+// img.complete 只代表 HTTP 完成，不代表已解码。未完全解码的图片在 drawImage 时会
+// 绘制为空/白块，这是障碍物闪烁的根本原因。decode() 返回 Promise，解析后保证可用。
+Promise.all(allImgs.map(function(img){
+  if(img.decode){
+    return img.decode().catch(function(){});
+  }
+  // 回退：不支持 decode 的旧浏览器
+  return new Promise(function(resolve){
+    if(img.complete){resolve();return;}
+    img.onload = resolve;
+    img.onerror = resolve;
+  });
+})).then(function(){
+  imagesReady = true;
+  state = 'menu';
+  dino = new Dinosaur();
+  clouds = [];
+  obstacles = [];
+  requestAnimationFrame(gameLoop);
+});
+
+})();
+</script>
+</body>
+</html>
