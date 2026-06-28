@@ -54,8 +54,18 @@ except Exception as e:
     print(f"Warning: Failed to patch lightrag.utils: {e}")
     traceback.print_exc()
 
-from .code_executor import run_code, run_code_sync
-from .query_item_tool import query_numbered_item
+# Optional tools - only import if files exist
+run_code = None
+run_code_sync = None
+query_numbered_item = None
+
+try:
+    from .code_executor import run_code, run_code_sync
+    from .query_item_tool import query_numbered_item
+except ImportError:
+    # Files don't exist in this deployment, skip importing
+    pass
+
 from .rag_tool import rag_search
 from .web_search import web_search
 

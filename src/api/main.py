@@ -19,7 +19,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from src.api.routers import explain, history, homework, memory, reading_materials, settings, textbook, wrong_book
+from src.api.routers import explain, generate, history, homework, memory, reading_materials, settings, textbook, wrong_book
 from src.logging import get_logger
 
 logger = get_logger("API")
@@ -86,6 +86,7 @@ app.include_router(memory.router,      prefix="/api/v1/profile",     tags=["prof
 app.include_router(history.router,     prefix="/api/v1/history",     tags=["history"])
 app.include_router(textbook.router,                                   tags=["textbook"])
 app.include_router(reading_materials.router,                          tags=["reading-materials"])
+app.include_router(generate.router,      prefix="/api/v1/generate",    tags=["generate"])
 
 
 # ── Root ──────────────────────────────────────────────────────────────────────
