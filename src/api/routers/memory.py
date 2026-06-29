@@ -16,6 +16,7 @@ GET    /api/v1/profile/review-queue           — 优先复习科目建议
 """
 from __future__ import annotations
 
+import asyncio
 import sys
 from pathlib import Path
 from typing import Optional
@@ -33,6 +34,16 @@ from src.logging import get_logger
 logger = get_logger("ProfileRouter")
 
 router = APIRouter()
+
+
+def _log_mem_bg_error(task: asyncio.Task) -> None:
+    """记录 EverMemOS 后台任务的未捕获异常。"""
+    try:
+        exc = task.exception()
+        if exc:
+            logger.warning(f"EverMemOS 后台任务异常: {exc}")
+    except (asyncio.CancelledError, asyncio.InvalidStateError):
+        pass
 
 _data_dir = _project_root / "data"
 _mem_service: Optional[MemoryService] = None
@@ -104,7 +115,8 @@ async def update_preferences(body: PreferencesUpdate):
     try:
         from src.services.evermemos import get_evermemos_service
         evermemos = get_evermemos_service()
-        _asyncio.create_task(evermemos.log_user_profile(memory.preferences.model_dump()))
+        task = _asyncio.create_task(evermemos.log_user_profile(memory.preferences.model_dump()))
+        task.add_done_callback(_log_mem_bg_error)
     except Exception:
         pass
 

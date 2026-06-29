@@ -19,8 +19,6 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-from pathlib import Path as _Path
-
 from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 
@@ -179,7 +177,7 @@ async def explain_entry(
     image_bytes: Optional[bytes] = None
     image_content_type = "image/jpeg"
     if entry.source_image_path:
-        img_path = _Path(entry.source_image_path)
+        img_path = Path(entry.source_image_path)
         if img_path.exists():
             try:
                 image_bytes = img_path.read_bytes()

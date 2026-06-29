@@ -48,11 +48,11 @@ try:
                 return dec
 
             _utils.wrap_embedding_func_with_attrs = _wrap
-except Exception as e:
+except (ModuleNotFoundError, ImportError, Exception) as e:
     import traceback
 
     print(f"Warning: Failed to patch lightrag.utils: {e}")
-    traceback.print_exc()
+    # lightrag is optional, continue startup without it
 
 # Optional tools - only import if files exist
 run_code = None
@@ -88,7 +88,7 @@ try:
     ]
 except ImportError as e:
     # If import fails (e.g., missing tiktoken), only export basic tools
-    print(f"⚠️  Some paper tools import failed: {e}")
+    print(f"WARNING: Some paper tools import failed: {e}")
     __all__ = [
         "query_numbered_item",
         "rag_search",

@@ -184,7 +184,8 @@ async def upload_textbook(
         logger.info(f"[Textbook] 已清除旧索引: {old_index_dir}")
 
     # 后台触发建库
-    asyncio.create_task(_build_index_bg(subject, cfg))
+    task = asyncio.create_task(_build_index_bg(subject, cfg))
+    task.add_done_callback(_log_bg_task_error_tb)
 
     return {
         "ok":      True,
@@ -213,7 +214,8 @@ async def reindex_subject(subject: str) -> dict[str, Any]:
     if old_index_dir.exists():
         shutil.rmtree(old_index_dir, ignore_errors=True)
 
-    asyncio.create_task(_build_index_bg(subject, cfg))
+    task = asyncio.create_task(_build_index_bg(subject, cfg))
+    task.add_done_callback(_log_bg_task_error_tb)
 
     return {
         "ok":      True,
@@ -306,6 +308,16 @@ async def rename_textbook(
 
 
 # ── Background task ───────────────────────────────────────────────────────────
+
+def _log_bg_task_error_tb(task: asyncio.Task) -> None:
+    """记录后台索引任务的未捕获异常。"""
+    try:
+        exc = task.exception()
+        if exc:
+            logger.error(f"后台索引任务异常: {exc}", exc_info=exc)
+    except (asyncio.CancelledError, asyncio.InvalidStateError):
+        pass
+
 
 async def _build_index_bg(subject: str, cfg: dict) -> None:
     """后台协程：调用 TextbookKBManager 完成向量化。"""

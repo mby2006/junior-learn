@@ -26,15 +26,64 @@
   </script>
 
   <style>
+    /* ─── Theme variables ─── */
+    :root {
+      --bg-body: #F8F9FC;
+      --bg-card: #FFFFFF;
+      --bg-input: #F8F9FC;
+      --bg-hover: rgba(79,140,255,.05);
+      --bg-overlay: #F8F9FC;
+      --border-default: #E8EDF4;
+      --border-input: #E2E8F0;
+      --border-pill: #D0D8EB;
+      --text-primary: #1E293B;
+      --text-secondary: #64748B;
+      --text-body: #334155;
+      --text-muted: #475569;
+      --accent: #4F8CFF;
+      --grid-color: rgba(79,140,255,.035);
+      --scrollbar-track: #F0F4FF;
+      --scrollbar-thumb: #D0D8EB;
+      --scrollbar-thumb-h: #B0BBD5;
+      --progress-bg: #F0F4FF;
+      --track-bg: #EEF2F7;
+      --btn-disabled-bg: #E8EDF4;
+      --btn-disabled-text: #64748B;
+    }
+    html.dark {
+      --bg-body: #0F172A;
+      --bg-card: #1E293B;
+      --bg-input: #1E293B;
+      --bg-hover: rgba(96,165,250,.08);
+      --bg-overlay: #0F172A;
+      --border-default: #334155;
+      --border-input: #475569;
+      --border-pill: #475569;
+      --text-primary: #E2E8F0;
+      --text-secondary: #94A3B8;
+      --text-body: #CBD5E1;
+      --text-muted: #94A3B8;
+      --accent: #60A5FA;
+      --grid-color: rgba(96,165,250,.05);
+      --scrollbar-track: #1E293B;
+      --scrollbar-thumb: #475569;
+      --scrollbar-thumb-h: #64748B;
+      --progress-bg: #1E293B;
+      --track-bg: #1E293B;
+      --btn-disabled-bg: #334155;
+      --btn-disabled-text: #64748B;
+    }
+    .border-default { border-color: var(--border-default); }
+
     *, *::before, *::after { box-sizing: border-box; }
     html, body { height: 100%; margin: 0; overflow: hidden; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', system-ui, sans-serif; background: #F8F9FC; color: #1E293B; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', system-ui, sans-serif; background: var(--bg-body); color: var(--text-primary); }
 
     /* ─── bg grid ─── */
     .bg-grid {
       background-image:
-        linear-gradient(rgba(79,140,255,.035) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(79,140,255,.035) 1px, transparent 1px);
+        linear-gradient(var(--grid-color) 1px, transparent 1px),
+        linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
       background-size: 40px 40px;
     }
 
@@ -46,12 +95,12 @@
       transition: all .18s;
     }
     .nav-btn.active { border-left-color:#4F8CFF; background:rgba(79,140,255,.10); color:#4F8CFF; }
-    .nav-btn:not(.active):hover { background:rgba(79,140,255,.05); border-left-color:rgba(79,140,255,.2); color:#334155; }
-    .nav-btn:not(.active) { color:#475569; }
+    .nav-btn:not(.active):hover { background:var(--bg-hover); border-left-color:rgba(79,140,255,.2); color:var(--text-body); }
+    .nav-btn:not(.active) { color:var(--text-muted); }
 
     /* ─── card ─── */
     .card {
-      background:#FFFFFF; border:1px solid #E8EDF4; border-radius:14px;
+      background:var(--bg-card); border:1px solid var(--border-default); border-radius:14px;
       box-shadow: 0 1px 3px rgba(0,0,0,.04);
       transition: border-color .2s, box-shadow .2s, transform .2s;
     }
@@ -62,7 +111,7 @@
     }
     .card-static { cursor:default; }
     .card-static:hover {
-      border-color:#E8EDF4;
+      border-color:var(--border-default);
       box-shadow: 0 1px 3px rgba(0,0,0,.04);
       transform: none;
     }
@@ -82,10 +131,10 @@
       border: none;
     }
     .btn-primary:hover { opacity: .88; }
-    .btn-primary:disabled { background: #E8EDF4; color: #64748B; cursor: not-allowed; }
+    .btn-primary:disabled { background: var(--btn-disabled-bg); color: var(--btn-disabled-text); cursor: not-allowed; }
 
     .btn-outline {
-      background: #FFFFFF;
+      background: var(--bg-card);
       color: #4F8CFF;
       font-weight: 500;
       border: 1px solid #4F8CFF;
@@ -100,7 +149,7 @@
 
     .btn-ghost {
       background: transparent;
-      color: #475569;
+      color: var(--text-muted);
       font-weight: 500;
       border: none;
       border-radius: 8px;
@@ -120,7 +169,7 @@
       transition: opacity .15s, background .15s;
     }
     .btn-neon:hover { opacity:.88; }
-    .btn-neon:disabled { background:#E8EDF4; color:#64748B; cursor:not-allowed; }
+    .btn-neon:disabled { background:var(--btn-disabled-bg); color:var(--btn-disabled-text); cursor:not-allowed; }
 
     /* ─── subject badges ─── */
     .b-math     {background:rgba(79,140,255,.12);color:#4F8CFF;border:1px solid rgba(79,140,255,.25);}
@@ -138,7 +187,7 @@
     .input-base {
       height: 36px;
       padding: 0 12px;
-      border: 1px solid #E2E8F0;
+      border: 1px solid var(--border-input);
       border-radius: 8px;
       font-size: 14px;
       outline: none;
@@ -158,21 +207,21 @@
     #loading-overlay {
       position:fixed; inset:0; z-index:99999;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      background:#F8F9FC; transition:opacity .35s;
+      background:var(--bg-overlay); transition:opacity .35s;
     }
     #loading-overlay.hidden { opacity:0; pointer-events:none; }
     #loading-spinner {
       width:40px; height:40px; border-radius:50%;
-      border:3px solid #E8EDF4; border-top-color:#4F8CFF;
+      border:3px solid var(--border-default); border-top-color:#4F8CFF;
       animation:spin 1s linear infinite;
     }
     #loading-text {
-      margin-top:20px; font-size:.875rem; color:#64748B;
+      margin-top:20px; font-size:.875rem; color:var(--text-secondary);
       font-family:-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
     }
     #loading-progress {
       margin-top:12px; width:180px; height:4px;
-      background:#E8EDF4; border-radius:4px; overflow:hidden;
+      background:var(--border-default); border-radius:4px; overflow:hidden;
     }
     #loading-progress-bar {
       height:100%; width:0%; background:#4F8CFF;
@@ -185,17 +234,17 @@
     @keyframes pdf-spin { to{transform:rotate(360deg)} }
     .pdf-loader-card {
       width:min(280px, calc(100vw - 48px)); margin:12vh auto 0; padding:22px 20px;
-      background:#FFFFFF; border:1px solid #E8EDF4; border-radius:18px;
+      background:var(--bg-card); border:1px solid var(--border-default); border-radius:18px;
       box-shadow:0 24px 60px rgba(15,23,42,.22); text-align:center;
     }
     .pdf-progress-ring {
       position:relative; width:86px; height:86px; margin:0 auto 14px; border-radius:50%;
-      background:conic-gradient(#4F8CFF calc(var(--progress, 0) * 1%), #E8EDF4 0);
+      background:conic-gradient(#4F8CFF calc(var(--progress, 0) * 1%), var(--border-default) 0);
       display:grid; place-items:center;
     }
     .pdf-progress-ring::before {
-      content:""; width:68px; height:68px; border-radius:50%; background:#FFFFFF;
-      box-shadow:inset 0 0 0 1px #EEF2F7;
+      content:""; width:68px; height:68px; border-radius:50%; background:var(--bg-card);
+      box-shadow:inset 0 0 0 1px var(--track-bg);
     }
     .pdf-progress-ring::after {
       content:""; position:absolute; inset:-4px; border-radius:50%;
@@ -204,9 +253,9 @@
     }
     .pdf-progress-value {
       position:absolute; inset:0; display:grid; place-items:center;
-      color:#1E293B; font-weight:700; font-size:1rem; letter-spacing:-.02em;
+      color:var(--text-primary); font-weight:700; font-size:1rem; letter-spacing:-.02em;
     }
-    .pdf-progress-track { height:6px; border-radius:999px; background:#EEF2F7; overflow:hidden; }
+    .pdf-progress-track { height:6px; border-radius:999px; background:var(--track-bg); overflow:hidden; }
     .pdf-progress-bar { height:100%; border-radius:999px; background:#4F8CFF; transition:width .2s ease-out; }
     .pdf-page-wrap { margin:0 auto 18px; width:max-content; max-width:100%; }
     .pdf-page-wrap:last-child { margin-bottom:0; }
@@ -217,42 +266,42 @@
 
     /* ─── scrollbar ─── */
     ::-webkit-scrollbar { width:5px; }
-    ::-webkit-scrollbar-track { background:#F0F4FF; }
-    ::-webkit-scrollbar-thumb { background:#D0D8EB; border-radius:3px; }
-    ::-webkit-scrollbar-thumb:hover { background:#B0BBD5; }
+    ::-webkit-scrollbar-track { background:var(--scrollbar-track); }
+    ::-webkit-scrollbar-thumb { background:var(--scrollbar-thumb); border-radius:3px; }
+    ::-webkit-scrollbar-thumb:hover { background:var(--scrollbar-thumb-h); }
 
     /* ─── markdown ─── */
     .md h1,.md h2,.md h3 { color:#4F8CFF; font-weight:600; margin:.75rem 0 .35rem; }
     .md h1{font-size:1.1rem} .md h2{font-size:1rem} .md h3{font-size:.9rem}
-    .md p { margin-bottom:.6rem; line-height:1.8; color:#334155; }
+    .md p { margin-bottom:.6rem; line-height:1.8; color:var(--text-body); }
     .md ul,.md ol { margin-left:1.25rem; margin-bottom:.6rem; }
-    .md li { margin-bottom:.2rem; color:#334155; }
+    .md li { margin-bottom:.2rem; color:var(--text-body); }
     .md code { background:rgba(79,140,255,.08); color:#4F8CFF; padding:.1em .35em; border-radius:3px; font-family:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace; font-size:.82em; }
-    .md pre { background:#F8F9FC; border:1px solid #E8EDF4; border-radius:8px; padding:.75rem; overflow-x:auto; margin-bottom:.6rem; }
-    .md pre code { background:none; color:#1E293B; padding:0; }
-    .md strong { color:#1E293B; }
+    .md pre { background:var(--bg-input); border:1px solid var(--border-default); border-radius:8px; padding:.75rem; overflow-x:auto; margin-bottom:.6rem; }
+    .md pre code { background:none; color:var(--text-primary); padding:0; }
+    .md strong { color:var(--text-primary); }
     .md em { color:#F472B6; }
-    .md blockquote { border-left:3px solid #4F8CFF; padding-left:.75rem; color:#64748B; margin-bottom:.6rem; }
+    .md blockquote { border-left:3px solid #4F8CFF; padding-left:.75rem; color:var(--text-secondary); margin-bottom:.6rem; }
     .md a { color:#4F8CFF; text-decoration:underline; }
     .md .math-block { overflow-x:auto; overflow-y:hidden; margin:.75rem 0; padding:.35rem 0; }
     .md .katex-display { margin:.4rem 0; }
-    .md .katex { color:#1E293B; font-size:1.02em; }
+    .md .katex { color:var(--text-primary); font-size:1.02em; }
 
     /* ─── stat ring ─── */
-    .ring-bg { stroke:#E8EDF4; }
+    .ring-bg { stroke:var(--border-default); }
     .ring-fill { stroke:#4F8CFF; stroke-linecap:round; transition:stroke-dashoffset 1.2s ease; }
 
     /* ─── pill select ─── */
     .pill {
-      padding:6px 14px; border-radius:8px; font-size:13px; font-weight:500; border:1px solid #D0D8EB;
-      background:#FFFFFF; color:#475569; cursor:pointer; transition:all .2s;
+      padding:6px 14px; border-radius:8px; font-size:13px; font-weight:500; border:1px solid var(--border-pill);
+      background:var(--bg-card); color:var(--text-muted); cursor:pointer; transition:all .2s;
     }
     .pill.on { background:rgba(79,140,255,.10); border-color:rgba(79,140,255,.4); color:#4F8CFF; }
-    .pill:not(.on):hover { border-color:#B0BBD5; color:#334155; }
+    .pill:not(.on):hover { border-color:#B0BBD5; color:var(--text-body); }
 
     /* ─── ghost btn ─── */
-    .btn-ghost { padding:8px 16px; border-radius:8px; border:1px solid #E8EDF4; font-size:.8rem; color:#475569; cursor:pointer; transition:all .2s; }
-    .btn-ghost:hover { border-color:#D0D8EB; color:#475569; }
+    .btn-ghost { padding:8px 16px; border-radius:8px; border:1px solid var(--border-default); font-size:.8rem; color:var(--text-muted); cursor:pointer; transition:all .2s; }
+    .btn-ghost:hover { border-color:#D0D8EB; color:var(--text-muted); }
 
     /* ─── knowledge point chip (clickable) ─── */
     .kp-chip {
@@ -265,7 +314,7 @@
     .kp-chip.no-match { opacity:.35; cursor:default; }
     .kp-chip.no-match:hover { background:rgba(79,140,255,.07); border-color:rgba(79,140,255,.18); transform:none; box-shadow:none; }
 
-    /* ─── review overlay ─── */
+    /* ─── this.review overlay ─── */
     @keyframes flipIn { from{opacity:0;transform:translateY(4px)} to{opacity:1;transform:translateY(0)} }
     .review-card { animation:flipIn .22s ease; }
 
@@ -279,7 +328,7 @@
     .qa-amber:hover { background:rgba(245,158,11,.12); box-shadow:0 0 20px rgba(245,158,11,.1); }
 
     /* ─── dashboard: mastery bar ─── */
-    .mastery-bar { height:6px; border-radius:3px; background:#F0F4FF; overflow:hidden; }
+    .mastery-bar { height:6px; border-radius:3px; background:var(--progress-bg); overflow:hidden; }
     .mastery-fill { height:100%; border-radius:3px; background:#4F8CFF; transition:width 1.2s ease; }
 
     /* ─── dashboard: subject level badges ─── */
@@ -289,15 +338,15 @@
 
     /* ─── dashboard: timeline ─── */
     .tl-dot  { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:3px; }
-    .tl-line { width:1px; background:#E8EDF4; flex:1; min-height:10px; margin:2px auto; }
+    .tl-line { width:1px; background:var(--border-default); flex:1; min-height:10px; margin:2px auto; }
 
-    .flow-card { background:#F8F9FC; border:1px solid #E8EDF4; border-radius:12px; padding:14px 16px; flex:1; min-width:0; cursor:pointer; }
+    .flow-card { background:var(--bg-input); border:1px solid var(--border-default); border-radius:12px; padding:14px 16px; flex:1; min-width:0; cursor:pointer; }
     .flow-arrow { color:#4F8CFF; font-size:1.1rem; flex-shrink:0; align-self:center; opacity:.4; }
 
     /* ─── session sidebar (inquire page) ─── */
     .sess-sidebar {
       width:220px; flex-shrink:0; display:flex; flex-direction:column; overflow:hidden;
-      background:#FFFFFF; border-right:1px solid #E8EDF4;
+      background:var(--bg-card); border-right:1px solid var(--border-default);
     }
     @media (max-width:767px) {
       .sess-sidebar {
@@ -312,7 +361,7 @@
     .sess-item.active { background:rgba(79,140,255,.08); border-left-color:#4F8CFF; }
     .hw-sidebar {
       width:220px; flex-shrink:0; display:flex; flex-direction:column; overflow:hidden;
-      background:#FFFFFF; border-right:1px solid #E8EDF4;
+      background:var(--bg-card); border-right:1px solid var(--border-default);
     }
     @media (max-width:767px) {
       .hw-sidebar {
@@ -330,9 +379,9 @@
     .btab-bar {
       position:fixed; bottom:0; left:0; right:0; z-index:50;
       display:flex; align-items:stretch;
-      background:rgba(255,255,255,.97);
+      background:var(--bg-card);
       backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
-      border-top:1px solid #E8EDF4;
+      border-top:1px solid var(--border-default);
       /* iOS home indicator safe area */
       padding-bottom:env(safe-area-inset-bottom, 0px);
     }
@@ -340,7 +389,7 @@
       flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center;
       padding:8px 2px 6px; gap:2px;
       background:none; border:none; cursor:pointer;
-      color:#64748B; transition:color .18s; position:relative; min-width:0;
+      color:var(--text-secondary); transition:color .18s; position:relative; min-width:0;
     }
     .btab-btn.on { color:#4F8CFF; }
     .btab-btn .ti { font-size:1.25rem; line-height:1.1; }
@@ -389,7 +438,7 @@
       .mobile-chat-page { height: auto !important; min-height: 100%; }
       .mobile-chat-main { min-height: auto !important; padding-bottom: var(--mobile-tab-offset); }
       .mobile-chat-scroll { flex: none !important; min-height: 260px; height: auto !important; max-height: none !important; overflow: visible !important; }
-      .mobile-chat-input { padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important; background: #fff; }
+      .mobile-chat-input { padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px)) !important; background: var(--bg-card); }
       .mobile-textarea { max-height: min(32vh, 120px) !important; }
       .mobile-pdf-modal { height: 100dvh !important; }
       .mobile-pdf-viewer { height: calc(100dvh - 58px) !important; padding-bottom: env(safe-area-inset-bottom, 0px); }
@@ -403,6 +452,23 @@
     @supports(padding-top: env(safe-area-inset-top)) {
       header { padding-top: max(env(safe-area-inset-top, 0px), 1rem); }
     }
+
+    /* ─── Dark mode Tailwind overrides ─── */
+    html.dark .bg-white { background-color: var(--bg-card); }
+    html.dark .bg-slate-50 { background-color: var(--bg-input); }
+    html.dark .bg-slate-100 { background-color: var(--bg-input); }
+    html.dark .bg-slate-200 { background-color: var(--border-default); }
+    html.dark .border-slate-100 { border-color: var(--border-default); }
+    html.dark .border-slate-200 { border-color: var(--border-default); }
+    html.dark .text-slate-800 { color: var(--text-primary); }
+    html.dark .text-slate-700 { color: var(--text-body); }
+    html.dark .text-slate-600 { color: var(--text-body); }
+    html.dark .text-slate-500 { color: var(--text-secondary); }
+    html.dark .text-slate-400 { color: var(--text-secondary); }
+    html.dark .text-slate-50 { color: var(--text-primary); }
+    html.dark .bg-blue-50 { background-color: rgba(96,165,250,.1); }
+    html.dark .hover\:bg-slate-50:hover { background-color: var(--bg-input); }
+    html.dark .accent-blue-500 { accent-color: var(--accent); }
   </style>
 </head>
 
@@ -441,10 +507,10 @@
     <!-- ═══════════════════════════════════════════════════════
          SIDEBAR
     ════════════════════════════════════════════════════════════ -->
-    <aside class="w-52 flex-shrink-0 bg-white border-r border-[#E8EDF4] flex-col hidden md:flex">
+    <aside class="w-52 flex-shrink-0 bg-white border-r border-default flex-col hidden md:flex">
 
       <!-- logo -->
-      <div class="px-5 py-5 border-b border-[#E8EDF4]">
+      <div class="px-5 py-5 border-b border-default">
         <div class="flex items-center gap-3">
           <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(79,140,255,.10);border:1px solid rgba(79,140,255,.25)">
             <span style="font-size:1rem">⚡</span>
@@ -470,7 +536,7 @@
       </nav>
 
       <!-- bottom status -->
-      <div class="p-4 border-t border-[#E8EDF4] space-y-2">
+      <div class="p-4 border-t border-default space-y-2">
         <div class="text-xs text-slate-800 uppercase tracking-widest mb-2">系统状态</div>
         <div class="flex justify-between text-xs">
           <span class="text-slate-800">API</span>
@@ -496,19 +562,27 @@
     <div class="flex-1 flex flex-col overflow-hidden">
 
       <!-- header -->
-      <header class="flex-shrink-0 px-4 md:px-8 py-3 md:py-4 border-b border-[#E8EDF4] bg-white">
+      <header class="flex-shrink-0 px-4 md:px-8 py-3 md:py-4 border-b border-default bg-white">
         <div class="flex items-center justify-between">
           <div>
             <h1 class="text-base font-semibold text-slate-800" x-text="navItems.find(n=>n.id===page)?.label||'主控台'"></h1>
             <p class="text-xs text-slate-400 mt-0.5" x-text="navItems.find(n=>n.id===page)?.desc||''"></p>
           </div>
-          <div class="text-xs text-slate-800 font-mono tabular-nums" x-text="clock"></div>
+          <div class="flex items-center gap-3">
+            <button @click="toggleTheme()"
+              class="w-8 h-8 flex items-center justify-center rounded-lg transition-all"
+              style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-muted);font-size:0.9rem"
+              :title="darkMode ? '切换到浅色模式' : '切换到深色模式'">
+              <span x-text="darkMode ? '☀️' : '🌙'"></span>
+            </button>
+            <div class="text-xs text-slate-800 font-mono tabular-nums" x-text="clock"></div>
+          </div>
         </div>
       </header>
 
       <!-- page content -->
       <div class="flex-1" id="main-scroll"
-        :class="page==='inquire' ? 'overflow-y-auto md:overflow-hidden flex flex-col mob-scroll' : (['history','homework'].includes(page) ? 'overflow-hidden flex flex-col' : (page==='dino' ? 'overflow-y-auto mob-scroll' : 'overflow-y-auto p-4 md:p-8 mob-scroll'))"
+        :class="page==='inquire' ? 'overflow-y-auto md:overflow-hidden flex flex-col mob-scroll' : (page==='homework' ? 'overflow-hidden flex flex-col' : (page==='history' ? 'overflow-y-auto mob-scroll' : (page==='dino' ? 'overflow-y-auto mob-scroll' : 'overflow-y-auto p-4 md:p-8 mob-scroll')))"
         style="min-height:0">
 
         <!-- ════════ DASHBOARD ════════ -->
@@ -611,7 +685,7 @@
               <span class="text-xs text-slate-500" x-text="wbStats?.unmastered + ' 题待复习'"></span>
             </div>
             <div class="flex items-center gap-3">
-              <div class="flex-1 rounded-full h-3 overflow-hidden" style="background:#F0F4FF">
+              <div class="flex-1 rounded-full h-3 overflow-hidden" style="background:var(--progress-bg)">
                 <div class="h-full rounded-full transition-all duration-700 bg-F59E0B"
                   :style="'width:' + Math.round((wbStats?.unmastered / (wbStats?.total || 1)) * 100) + '%'"></div>
               </div>
@@ -634,7 +708,7 @@
                 <template x-for="s in subjectStrengthBars" :key="s.s">
                   <div class="flex items-center gap-3">
                     <span class="text-xs text-slate-800 w-10 text-right flex-shrink-0" x-text="s.label"></span>
-                    <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:#F0F4FF">
+                    <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:var(--progress-bg)">
                       <div class="h-full rounded-full transition-all duration-700"
                         :style="'width:'+s.pct+'%;background:'+s.color"></div>
                     </div>
@@ -651,7 +725,7 @@
                 <template x-for="s in subjectBars.filter(x=>x.count>0)" :key="s.name">
                   <div class="flex items-center gap-3">
                     <span class="text-xs text-slate-800 w-10 text-right flex-shrink-0" x-text="s.label"></span>
-                    <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:#F0F4FF">
+                    <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:var(--progress-bg)">
                       <div class="h-full rounded-full transition-all duration-700"
                         :style="'width:'+s.pct+'%;background:'+s.color"></div>
                     </div>
@@ -897,7 +971,7 @@
 
           <!-- ── history sidebar ── -->
           <div class="hw-sidebar" :class="hw.showSidebar ? 'open' : ''">
-            <div class="flex-shrink-0 p-3" style="border-bottom:1px solid #E8EDF4">
+            <div class="flex-shrink-0 p-3" style="border-bottom:1px solid var(--border-default)">
               <div class="flex items-center justify-between mb-2">
                 <span class="text-xs text-slate-800 uppercase tracking-widest">批改历史</span>
                 <span x-show="hw.histList.length>0" class="text-xs px-1.5 py-0.5 rounded-full font-mono"
@@ -952,9 +1026,9 @@
           <div class="max-w-3xl mx-auto w-full px-3 py-3 md:px-4 md:py-4">
 
           <!-- mobile top bar (upload state) -->
-          <div x-show="hw.state==='upload'" class="md:hidden flex-shrink-0 flex items-center gap-2 px-4 py-2" style="border-bottom:1px solid #E8EDF4">
+          <div x-show="hw.state==='upload'" class="md:hidden flex-shrink-0 flex items-center gap-2 px-4 py-2" style="border-bottom:1px solid var(--border-default)">
             <button class="w-7 h-7 flex items-center justify-center rounded-lg text-sm flex-shrink-0"
-              style="background:#F8F9FC;border:1px solid #E8EDF4;color:#1E293B"
+              style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-primary)"
               @click="hw.showSidebar=true" title="历史记录">☰</button>
             <span class="text-xs text-slate-800">批改历史</span>
           </div>
@@ -971,7 +1045,7 @@
                   <template x-for="s in subjects" :key="s.v">
                     <button
                       class="rounded-xl p-3 md:p-5 text-left transition-all"
-                      style="background:#F8F9FC;border:1px solid #E8EDF4;color:#334155"
+                      style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-body)"
                       @mouseover="$el.style.borderColor='rgba(79,140,255,.4)';$el.style.background='rgba(79,140,255,.04)'"
                       @mouseout="$el.style.borderColor='#E8EDF4';$el.style.background='#F8F9FC'"
                       @click="hw.subject=s.v; hw.step='upload'">
@@ -988,7 +1062,7 @@
               <div class="card p-8 mb-5 mobile-card-tight">
 
                 <!-- 已选科目 + 更换按钮 -->
-                <div class="flex items-center gap-3 mb-5 pb-4" style="border-bottom:1px solid #E8EDF4">
+                <div class="flex items-center gap-3 mb-5 pb-4" style="border-bottom:1px solid var(--border-default)">
                   <button
                     class="text-xs px-3 py-1.5 rounded-lg"
                     style="background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.2);color:#4F8CFF"
@@ -1012,7 +1086,7 @@
                   <div x-show="hw.recordType==='exam'" class="mt-3">
                     <input x-model="hw.examName"
                       class="w-full px-3 py-2 text-sm rounded-lg outline-none"
-                      style="background:#F8F9FC;border:1px solid #E8EDF4;color:#334155"
+                      style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-body)"
                       placeholder="考试名称（如：期中考试、月考）"
                       @focus="$el.style.borderColor='rgba(79,140,255,.4)'"
                       @blur="$el.style.borderColor='#E8EDF4'">
@@ -1092,7 +1166,7 @@
             </div>
             <div class="text-slate-800 font-semibold text-lg mb-2">AI 批改中...</div>
             <div class="text-slate-800 text-sm mb-5" x-text="hw.msg"></div>
-            <div class="max-w-xs mx-auto rounded-full h-1.5 overflow-hidden" style="background:#F0F4FF">
+            <div class="max-w-xs mx-auto rounded-full h-1.5 overflow-hidden" style="background:var(--progress-bg)">
               <div class="h-full rounded-full prog-bar" style="background:#4F8CFF"></div>
             </div>
           </div>
@@ -1164,7 +1238,7 @@
                       <div class="flex items-center flex-wrap gap-1.5 mb-1.5">
                         <span class="text-xs text-slate-800 font-mono" x-text="'第 '+(i+1)+' 题'"></span>
                         <span x-show="q.question_type && q.question_type!=='unknown'"
-                          class="badge text-xs" style="background:#F0F4FF;color:#1E293B;border:1px solid #E8EDF4"
+                          class="badge text-xs" style="background:var(--progress-bg);color:var(--text-primary);border:1px solid var(--border-default)"
                           x-text="QTYPE_LABEL[q.question_type]||q.question_type"></span>
                         <span x-show="q.difficulty"
                           class="badge text-xs" :style="diffStyle(q.difficulty)"
@@ -1194,7 +1268,7 @@
                           <span style="color:#f59e0b" x-text="ERR_LABEL[q.error_type]||q.error_type"></span>
                         </div>
                         <div x-show="q.brief_comment" class="text-xs mt-1.5 px-3 py-2 rounded-lg"
-                          style="background:#F8F9FC;border-left:2px solid rgba(245,158,11,.4);color:#94a3b8"
+                          style="background:var(--bg-input);border-left:2px solid rgba(245,158,11,.4);color:#94a3b8"
                           x-text="q.brief_comment"></div>
 
                         <!-- appeal row -->
@@ -1298,7 +1372,7 @@
             </button>
             <button @click="wbClearKpFilter()"
               class="text-xs px-2.5 py-1.5 rounded-lg flex-shrink-0 transition-all"
-              style="border:1px solid #E8EDF4;color:#1E293B"
+              style="border:1px solid var(--border-default);color:var(--text-primary)"
               onmouseover="this.style.borderColor='#334155';this.style.color='#94a3b8'"
               onmouseout="this.style.borderColor='#E8EDF4';this.style.color='#475569'">
               × 清除
@@ -1331,7 +1405,7 @@
 
           <!-- loading -->
           <div x-show="wb.loading" class="text-center py-16 text-slate-800 fadein">
-            <div class="w-8 h-8 rounded-full spin mx-auto mb-3" style="border:2px solid #E8EDF4;border-top-color:#4F8CFF"></div>
+            <div class="w-8 h-8 rounded-full spin mx-auto mb-3" style="border:2px solid var(--border-default);border-top-color:#4F8CFF"></div>
             加载中...
           </div>
 
@@ -1351,7 +1425,7 @@
                   <div class="flex items-center gap-2 flex-wrap">
                     <span class="badge" :class="'b-'+e.subject" x-text="SUBJ_LABEL[e.subject]||e.subject"></span>
                     <span x-show="e.question_type&&e.question_type!=='unknown'"
-                      class="badge" style="background:#F0F4FF;color:#1E293B;border:1px solid #E8EDF4"
+                      class="badge" style="background:var(--progress-bg);color:var(--text-primary);border:1px solid var(--border-default)"
                       x-text="QTYPE_LABEL[e.question_type]||e.question_type"></span>
                     <span x-show="e.mastered"
                       class="badge" style="background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.25)">✓ 已掌握</span>
@@ -1395,11 +1469,11 @@
 
                 <!-- brief comment -->
                 <div x-show="e.brief_comment" class="text-xs px-3 py-2 rounded-lg mb-3"
-                  style="background:#F8F9FC;border-left:2px solid rgba(245,158,11,.35);color:#64748b"
+                  style="background:var(--bg-input);border-left:2px solid rgba(245,158,11,.35);color:var(--text-secondary)"
                   x-text="e.brief_comment"></div>
 
                 <!-- action row -->
-                <div class="flex gap-2 pt-3 border-t border-[#E8EDF4]">
+                <div class="flex gap-2 pt-3 border-t border-default">
                   <button @click="wbExplain(e)" :disabled="e._explaining"
                     class="flex-1 py-2 rounded-lg text-xs font-semibold flex items-center justify-center gap-1 transition-all"
                     style="background:rgba(79,140,255,.08);border:1px solid rgba(79,140,255,.2);color:#4F8CFF"
@@ -1413,14 +1487,14 @@
                   </button>
                   <button @click="wbMastered(e)"
                     class="py-2 px-3 rounded-lg text-xs transition-all"
-                    :style="e.mastered?'background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#10b981':'border:1px solid #E8EDF4;color:#1E293B'"
+                    :style="e.mastered?'background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.3);color:#10b981':'border:1px solid var(--border-default);color:var(--text-primary)'"
                     onmouseover="if(!this.disabled)this.style.borderColor='#334155'"
                     onmouseout="">
                     <span x-text="e.mastered?'✓ 掌握':'掌握'"></span>
                   </button>
                   <button @click="wbDelete(e.entry_id)"
                     class="py-2 px-3 rounded-lg text-xs transition-all"
-                    style="border:1px solid #E8EDF4;color:#334155"
+                    style="border:1px solid var(--border-default);color:var(--text-body)"
                     onmouseover="this.style.borderColor='rgba(239,68,68,.3)';this.style.color='#ef4444'"
                     onmouseout="this.style.borderColor='#E8EDF4';this.style.color='#334155'">✕</button>
                 </div>
@@ -1439,7 +1513,7 @@
                     <div class="text-xs text-slate-800 mb-2">📖 教材原文参考</div>
                     <template x-for="snp in (e._explanation?.textbook_snippets||[])" :key="snp">
                       <div class="text-xs text-slate-800 px-3 py-2 mb-1 rounded-lg italic"
-                        style="background:#F8F9FC;border-left:2px solid rgba(244,114,182,.4)" x-text="snp"></div>
+                        style="background:var(--bg-input);border-left:2px solid rgba(244,114,182,.4)" x-text="snp"></div>
                     </template>
                   </div>
                 </div>
@@ -1454,7 +1528,7 @@
           <!-- ── session sidebar ── -->
           <div class="sess-sidebar" :class="iq.showSidebar ? 'open' : ''">
             <!-- new session button -->
-            <div class="flex-shrink-0 p-3" style="border-bottom:1px solid #E8EDF4">
+            <div class="flex-shrink-0 p-3" style="border-bottom:1px solid var(--border-default)">
               <button @click="iqNewSession()"
                 class="w-full flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-semibold transition-all"
                 style="background:rgba(79,140,255,.07);border:1px dashed rgba(79,140,255,.3);color:#4F8CFF"
@@ -1466,7 +1540,7 @@
               <div class="mt-2">
                 <input type="text" x-model="iq.searchText" placeholder="搜索会话..."
                   class="w-full px-2 py-1.5 rounded-lg text-xs outline-none"
-                  style="background:#F8F9FC;border:1px solid #E2E8F0;focus:border-color:#4F8CFF">
+                  style="background:var(--bg-input);border:1px solid var(--border-input);focus:border-color:#4F8CFF">
               </div>
             </div>
             <!-- session list -->
@@ -1476,7 +1550,7 @@
                 class="py-8 text-center text-xs text-slate-800 leading-relaxed px-3">
                 还没有历史会话<br>发出第一条消息后自动保存
               </div>
-              <template x-for="sess in iq.filteredSessions" :key="sess.session_id">
+              <template x-for="sess in iqFilteredSessions" :key="sess.session_id">
                 <div class="sess-item" :class="sess.session_id===iq.activeSessionId?'active':''"
                   @click="iqResumeSession(sess); iq.showSidebar=false">
                   <div class="text-xs font-medium leading-snug truncate"
@@ -1500,10 +1574,10 @@
           <div class="flex-1 flex flex-col min-w-0 mobile-chat-main" style="min-height:0">
 
           <!-- ── top bar: subject + model ── -->
-          <div class="flex-shrink-0 flex items-center gap-3 px-5 py-2.5 flex-wrap mobile-chat-toolbar" style="border-bottom:1px solid #E8EDF4">
+          <div class="flex-shrink-0 flex items-center gap-3 px-5 py-2.5 flex-wrap mobile-chat-toolbar" style="border-bottom:1px solid var(--border-default)">
             <!-- mobile: hamburger to open sidebar -->
             <button class="md:hidden flex-shrink-0 w-7 h-7 flex items-center justify-center rounded-lg text-sm"
-              style="background:#F8F9FC;border:1px solid #E8EDF4;color:#1E293B"
+              style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-primary)"
               @click="iq.showSidebar=true" title="会话列表">☰</button>
             <span class="text-xs text-slate-800 uppercase tracking-widest flex-shrink-0">科目</span>
             <div class="flex flex-wrap gap-1.5">
@@ -1520,7 +1594,7 @@
             <!-- clear chat -->
             <button x-show="iq.messages.length" @click="iq.messages=[]"
               class="text-xs px-3 py-0.5 rounded-lg transition-colors flex-shrink-0"
-              style="border:1px solid #E8EDF4;color:#1E293B"
+              style="border:1px solid var(--border-default);color:var(--text-primary)"
               onmouseover="this.style.color='#ef4444'" onmouseout="this.style.color='#475569'">清空</button>
           </div>
 
@@ -1547,7 +1621,7 @@
                       </span>
                     </div>
                     <div x-show="msg.content" class="text-sm px-4 py-3 rounded-2xl rounded-tr-sm whitespace-pre-wrap break-words"
-                      style="background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.25);color:#1E293B"
+                      style="background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.25);color:var(--text-primary)"
                       x-text="msg.content"></div>
                   </div>
                 </div>
@@ -1573,7 +1647,7 @@
                       <div class="text-xs text-slate-800">📖 教材参考</div>
                       <template x-for="snp in (msg.snippets||[])" :key="snp">
                         <div class="text-xs text-slate-800 px-3 py-2 rounded-lg italic"
-                          style="background:#F8F9FC;border-left:2px solid rgba(244,114,182,.35)" x-text="snp"></div>
+                          style="background:var(--bg-input);border-left:2px solid rgba(244,114,182,.35)" x-text="snp"></div>
                       </template>
                     </div>
                     <!-- favorite button -->
@@ -1589,24 +1663,24 @@
           </div>
 
           <!-- ── bottom input bar ── -->
-          <div class="flex-shrink-0 px-4 pb-4 pt-3 mobile-chat-input" style="border-top:1px solid #E8EDF4">
+          <div class="flex-shrink-0 px-4 pb-4 pt-3 mobile-chat-input" style="border-top:1px solid var(--border-default)">
             <!-- pending file chip -->
             <div x-show="iq.pendingFile" class="flex items-center gap-2 mb-2">
               <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs flex-1 min-w-0"
-                style="background:#F8F9FC;border:1px solid rgba(79,140,255,.25);color:#4F8CFF">
+                style="background:var(--bg-input);border:1px solid rgba(79,140,255,.25);color:#4F8CFF">
                 <span>📎</span>
                 <span class="truncate flex-1" x-text="iq.pendingFileName"></span>
                 <span x-show="iq.ocrRunning" class="text-slate-800 flex-shrink-0">识别中...</span>
               </div>
               <button @click="iq.pendingFile=null;iq.pendingFileName=''"
                 class="px-2.5 py-1.5 text-xs rounded-lg flex-shrink-0"
-                style="border:1px solid #E8EDF4;color:#1E293B">✕</button>
+                style="border:1px solid var(--border-default);color:var(--text-primary)">✕</button>
             </div>
             <!-- input row -->
             <div class="flex items-end gap-2">
               <!-- attach -->
               <label class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl cursor-pointer transition-all"
-                style="background:#F8F9FC;border:1px solid #E8EDF4;color:#1E293B;font-size:1.1rem"
+                style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-primary);font-size:1.1rem"
                 title="上传图片或PDF"
                 onmouseover="this.style.borderColor='rgba(79,140,255,.35)';this.style.color='#4F8CFF'"
                 onmouseout="this.style.borderColor='#E8EDF4';this.style.color='#475569'">
@@ -1616,7 +1690,7 @@
               <!-- textarea -->
               <textarea x-model="iq.input" rows="1" id="iq-input"
                 class="flex-1 px-4 py-2.5 text-sm rounded-xl resize-none outline-none transition-all mobile-textarea"
-                style="background:#F8F9FC;border:1px solid #E8EDF4;color:#334155;max-height:140px;overflow-y:auto;line-height:1.5"
+                style="background:var(--bg-input);border:1px solid var(--border-default);color:var(--text-body);max-height:140px;overflow-y:auto;line-height:1.5"
                 placeholder="输入题目…  Enter 发送，Shift+Enter 换行"
                 @focus="$el.style.borderColor='rgba(79,140,255,.4)'"
                 @blur="$el.style.borderColor='#E8EDF4'"
@@ -1628,7 +1702,7 @@
                 :disabled="(!iq.input.trim() && !iq.pendingFile) || iq.sending"
                 class="flex-shrink-0 w-9 h-9 flex items-center justify-center rounded-xl transition-all"
                 :style="(!iq.input.trim()&&!iq.pendingFile)||iq.sending
-                  ? 'background:#F8F9FC;border:1px solid #E8EDF4;color:#2d4060;cursor:not-allowed'
+                  ? 'background:var(--bg-input);border:1px solid var(--border-default);color:#2d4060;cursor:not-allowed'
                   : 'background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.35);color:#4F8CFF;cursor:pointer'">
                 <span x-show="!iq.sending" style="font-size:1rem">➤</span>
                 <span x-show="iq.sending" class="spin inline-block"
@@ -1671,7 +1745,7 @@
               <input id="rename-input" x-model="tb.renameInput"
                 @keydown.enter="tbConfirmRename()" @keydown.escape="tbCancelRename()"
                 class="w-full rounded-xl px-4 py-2.5 text-sm text-slate-800 mb-4"
-                style="background:#F8F9FC;border:1px solid #D0D8EB;outline:none"
+                style="background:var(--bg-input);border:1px solid var(--border-pill);outline:none"
                 placeholder="例如：英语教材_人教版2024">
               <div class="flex gap-3 justify-end">
                 <button class="text-xs px-4 py-2 rounded-lg text-slate-800 hover:text-blue-500 transition-colors" @click="tbCancelRename()">取消</button>
@@ -1696,7 +1770,7 @@
 
           <!-- ── PDF preview modal ── -->
           <div x-show="tb.preview.open" class="mobile-pdf-modal" style="position:fixed;inset:0;z-index:220;height:100vh;overflow:hidden;background:rgba(15,23,42,.86);display:flex;flex-direction:column" @keydown.escape.window="tbClosePreview()">
-            <div class="flex items-center justify-between gap-3 px-4 py-3" style="background:#fff;border-bottom:1px solid #E8EDF4">
+            <div class="flex items-center justify-between gap-3 px-4 py-3" style="background:#fff;border-bottom:1px solid var(--border-default)">
               <div class="min-w-0">
                 <div class="text-sm font-semibold text-slate-800 truncate" x-text="tb.preview.title || '教材预览'"></div>
                 <div class="text-xs text-slate-500" x-show="tb.preview.total" x-text="`第 ${tb.preview.page} / ${tb.preview.total} 页`"></div>
@@ -1736,7 +1810,7 @@
                   <div class="text-slate-800 text-xs">上传教材 PDF 后，题目问询与错题解析将自动检索相关教材内容（RAG 增强）</div>
                 </div>
                 <button class="text-xs px-3 py-1.5 rounded-lg text-slate-800 transition-colors hover:text-blue-500"
-                  style="border:1px solid #E8EDF4" @click="tbLoadStatus()">🔄 刷新</button>
+                  style="border:1px solid var(--border-default)" @click="tbLoadStatus()">🔄 刷新</button>
               </div>
 
               <!-- ── textbook list ── -->
@@ -1748,7 +1822,7 @@
                 <div x-show="!tb.loading" class="space-y-3">
                   <template x-for="s in tb.status" :key="s.subject">
                     <div class="flex items-center gap-4 rounded-xl px-4 py-3.5 transition-all mobile-stack"
-                      style="background:#F8F9FC;border:1px solid #E8EDF4">
+                      style="background:var(--bg-input);border:1px solid var(--border-default)">
 
                       <!-- subject icon + name -->
                       <div class="flex-1 min-w-0">
@@ -1787,7 +1861,7 @@
                         <!-- rename -->
                         <button x-show="s.pdf_exists"
                           class="text-xs px-3 py-1.5 rounded-lg transition-all"
-                          style="background:rgba(148,163,184,.06);color:#94a3b8;border:1px solid #E8EDF4"
+                          style="background:rgba(148,163,184,.06);color:#94a3b8;border:1px solid var(--border-default)"
                           @click="tbStartRename(s.subject, s.custom_name || s.pdf_filename.replace(/\.pdf$/i, ''))"
                           title="重命名文件">✏️</button>
                         <!-- delete -->
@@ -1821,7 +1895,7 @@
                   <div class="flex-1 min-w-48 mobile-min-0 mobile-full">
                     <div class="text-xs text-slate-800 mb-1.5">文件</div>
                     <label class="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all"
-                      style="background:#F8F9FC;border:1px dashed #D0D8EB;color:#1E293B"
+                      style="background:var(--bg-input);border:1px dashed var(--border-pill);color:var(--text-primary)"
                       onmouseover="this.style.borderColor='rgba(79,140,255,.3)'"
                       onmouseout="this.style.borderColor='#D0D8EB'">
                       <span>📄</span>
@@ -1848,20 +1922,20 @@
                     <div class="text-xs text-slate-800">上传题册、试卷、资料 PDF，仅用于在线阅读，不参与 AI 检索</div>
                   </div>
                   <button class="text-xs px-3 py-1.5 rounded-lg text-slate-800 transition-colors hover:text-blue-500"
-                    style="border:1px solid #E8EDF4" @click="rmLoad()">刷新</button>
+                    style="border:1px solid var(--border-default)" @click="rmLoad()">刷新</button>
                 </div>
                 <div x-show="rm.loading" class="text-xs text-slate-800 py-6 text-center">加载中...</div>
                 <div x-show="!rm.loading && rm.items.length===0" class="text-xs text-slate-800 py-6 text-center">暂无阅读资料</div>
                 <div x-show="!rm.loading && rm.items.length>0" class="space-y-3 mb-5">
                   <template x-for="m in rm.items" :key="m.id">
-                    <div class="flex items-center gap-4 rounded-xl px-4 py-3.5 mobile-stack" style="background:#F8F9FC;border:1px solid #E8EDF4">
+                    <div class="flex items-center gap-4 rounded-xl px-4 py-3.5 mobile-stack" style="background:var(--bg-input);border:1px solid var(--border-default)">
                       <div class="flex-1 min-w-0">
                         <div class="text-sm font-semibold text-slate-800 truncate" x-text="m.name"></div>
                         <div class="text-xs text-slate-800 truncate" x-text="`${m.original_filename || m.filename} · ${m.file_size_kb || 0} KB`"></div>
                       </div>
                       <div class="flex items-center gap-2 flex-shrink-0 mobile-wrap mobile-full">
                         <button class="text-xs px-2.5 py-1.5 rounded-lg transition-all" style="background:rgba(79,140,255,.06);color:#4F8CFF;border:1px solid rgba(79,140,255,.2)" @click="rmOpen(m)">打开</button>
-                        <button class="text-xs px-3 py-1.5 rounded-lg transition-all" style="background:rgba(148,163,184,.06);color:#64748b;border:1px solid #E8EDF4" @click="rmStartRename(m)">重命名</button>
+                        <button class="text-xs px-3 py-1.5 rounded-lg transition-all" style="background:rgba(148,163,184,.06);color:var(--text-secondary);border:1px solid var(--border-default)" @click="rmStartRename(m)">重命名</button>
                         <button class="text-xs px-3 py-1.5 rounded-lg transition-all" style="background:rgba(239,68,68,.06);color:#f87171;border:1px solid rgba(239,68,68,.2)" @click="rmDelete(m.id)">删除</button>
                       </div>
                     </div>
@@ -1883,7 +1957,7 @@
                   </div>
                   <div class="flex-1 min-w-48 mobile-min-0 mobile-full">
                     <div class="text-xs text-slate-800 mb-1.5">文件</div>
-                    <label class="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all" style="background:#F8F9FC;border:1px dashed #D0D8EB;color:#1E293B">
+                    <label class="flex items-center gap-2 px-3 py-2.5 rounded-xl cursor-pointer transition-all" style="background:var(--bg-input);border:1px dashed var(--border-pill);color:var(--text-primary)">
                       <span>📄</span>
                       <span class="text-sm truncate" x-text="rm.uploadFile ? rm.uploadFile.name : '选择阅读资料 PDF'"></span>
                       <input type="file" class="hidden" accept=".pdf" @change="rmFileSelect($event)">
@@ -1961,9 +2035,9 @@
                         <span class="text-xs text-slate-500 w-12 text-right">困难</span>
                       </div>
                       <div class="flex justify-between mt-1 text-xs text-slate-500 px-2">
-                        <span :class="gen.difficulty === 'easy' ? 'text-blue-600 font-medium' : ''">简单</span>
-                        <span :class="gen.difficulty === 'medium' ? 'text-blue-600 font-medium' : ''">中等</span>
-                        <span :class="gen.difficulty === 'hard' ? 'text-blue-600 font-medium' : ''">困难</span>
+                        <span :class="gen.difficulty_value === 'easy' ? 'text-blue-600 font-medium' : ''">简单</span>
+                        <span :class="gen.difficulty_value === 'medium' ? 'text-blue-600 font-medium' : ''">中等</span>
+                        <span :class="gen.difficulty_value === 'hard' ? 'text-blue-600 font-medium' : ''">困难</span>
                       </div>
                     </div>
 
@@ -2014,7 +2088,7 @@
                     <!-- 从历史批改生成仿真卷 -->
                     <div class="p-4 rounded-xl border-2 cursor-pointer transition-all"
                       :class="gen.mode === 'mimic-history' ? 'border-blue-500 bg-blue-50' : 'border-slate-200 bg-white hover:border-blue-200'"
-                      @click="gen.loadHistoryQuestions()">
+                      @click="loadHistoryQuestions()">
                       <div class="font-medium text-sm text-slate-800 mb-1">📄 仿真卷（历史）</div>
                       <p class="text-xs text-slate-500">基于已批改题目生成类似新题</p>
                     </div>
@@ -2035,7 +2109,7 @@
                     <span x-text="gen.status"></span>
                   </div>
                   <div></div>
-                  <button class="btn-primary" :disabled="gen.generating || !gen.knowledge_point.trim()" @click="gen.startGenerate()">
+                  <button class="btn-primary" :disabled="gen.generating || !gen.knowledge_point.trim()" @click="startGenerate()">
                     <span x-show="!gen.generating">🚀 开始生成</span>
                     <span x-show="gen.generating">生成中...</span>
                   </button>
@@ -2043,7 +2117,8 @@
               </div>
 
               <!-- 生成进度 -->
-              <div x-show="gen.current_progress" class="card p-5">
+              <template x-if="gen.current_progress">
+              <div class="card p-5">
                 <div class="flex items-center justify-between mb-3">
                   <span class="text-sm font-medium text-slate-800">生成进度</span>
                   <span class="text-xs text-slate-500" x-text="`${gen.current_progress.current}/${gen.current_progress.total}`"></span>
@@ -2054,6 +2129,7 @@
                 </div>
                 <div class="mt-2 text-xs text-slate-500" x-text="gen.current_progress.status"></div>
               </div>
+              </template>
 
               <!-- 已生成题目列表 -->
               <div x-show="gen.generated_questions.length > 0" class="card p-5">
@@ -2112,7 +2188,7 @@
                       </div>
 
                       <!-- 批改结果区域（提交后显示） -->
-                      <div x-show="gen.checked.has(item.question_id)" class="pt-3 border-t border-slate-100">
+                      <div x-show="!!gen.checked[item.question_id]" class="pt-3 border-t border-slate-100">
                         <div class="flex items-center gap-2 mb-2">
                           <span class="text-sm font-medium"
                             :class="gen.isCorrect(item.question_id) ? 'text-green-700' : 'text-red-700'"
@@ -2133,8 +2209,8 @@
                       <!-- 提交批改按钮 -->
                       <div class="flex items-center justify-end pt-2">
                         <button class="btn-primary text-sm py-2 px-4"
-                          :disabled="gen.checked.has(item.question_id) || !gen.hasUserAnswer(item.question_id)"
-                          @click="gen.checkAnswer(item)">
+                          :disabled="!!gen.checked[item.question_id] || !gen.hasUserAnswer(item.question_id)"
+                          @click="checkAnswer(item)">
                           提交答案
                         </button>
                       </div>
@@ -2145,8 +2221,8 @@
                 <!-- 统计 -->
                 <div class="mt-4 pt-4 border-t border-slate-200">
                   <div class="flex items-center gap-8 text-sm">
-                    <span>已提交：<span x-text="gen.checked.size" class="font-semibold text-blue-600"></span> / <span x-text="gen.generated_questions.length" class="text-slate-600"></span></span>
-                    <span>正确率：<span x-text="gen.correctRate" class="font-semibold text-blue-600"></span></span>
+                    <span>已提交：<span x-text="Object.keys(gen.checked).length" class="font-semibold text-blue-600"></span> / <span x-text="gen.generated_questions.length" class="text-slate-600"></span></span>
+                    <span>正确率：<span x-text="correctRate" class="font-semibold text-blue-600"></span></span>
                   </div>
                 </div>
               </div>
@@ -2158,7 +2234,7 @@
                     <div class="text-xs text-slate-800 uppercase tracking-widest">出题历史</div>
                     <div class="text-xs text-slate-500 mt-1">点击记录可重新加载进行练习</div>
                   </div>
-                  <button class="btn-ghost text-sm" @click="gen.loadGenerationHistory()" :disabled="gen.loading_history">
+                  <button class="btn-ghost text-sm" @click="loadGenerationHistory()" :disabled="gen.loading_history">
                     刷新
                   </button>
                 </div>
@@ -2172,7 +2248,7 @@
                   class="space-y-3 max-h-80 overflow-y-auto">
                   <template x-for="record in gen.generation_history.records" :key="record.id">
                     <div class="flex items-center justify-between p-3 rounded-lg border border-slate-200 hover:border-blue-200 transition-colors cursor-pointer"
-                      @click="gen.loadGeneratedRecord(record)">
+                      @click="loadGeneratedRecord(record)">
                       <div class="min-w-0">
                         <div class="flex items-center gap-2 mb-1">
                           <span class="text-sm font-medium text-slate-800 truncate">
@@ -2187,7 +2263,7 @@
                       </div>
                       <div class="flex items-center gap-2">
                         <button class="text-xs px-3 py-1.5 rounded-lg border border-slate-200 hover:border-blue-500 transition-colors"
-                          @click.stop="gen.deleteGenerationRecord(record.id); event.stopPropagation();">
+                          @click.stop="deleteGenerationRecord(record.id); event.stopPropagation();">
                           删除
                         </button>
                       </div>
@@ -2215,7 +2291,7 @@
               </div>
               <button class="text-xs px-2.5 py-1 rounded-md border border-slate-200 hover:bg-slate-50" @click="dinoRestart()">重新开始</button>
             </div>
-            <div class="mobile-dino-frame" style="border:1px solid #E8EDF4;border-radius:12px;overflow:hidden;background:#fff;height:clamp(360px,58vh,560px)">
+            <div class="mobile-dino-frame" style="border:1px solid var(--border-default);border-radius:12px;overflow:hidden;background:#fff;height:clamp(360px,58vh,560px)">
               <iframe id="dino-iframe" src="/ui/dino/index.html" style="width:100%;height:100%;border:none;display:block" scrolling="no" allow="autoplay"></iframe>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-2 text-xs text-slate-500 px-1">
@@ -2235,7 +2311,7 @@
         <div x-show="page==='profile'" x-transition:enter.transition.duration.200ms x-transition:leave.transition.duration.100ms class="fadein">
 
           <div x-show="prof.loading" class="text-center py-16 text-slate-800 fadein">
-            <div class="w-8 h-8 rounded-full spin mx-auto mb-3" style="border:2px solid #E8EDF4;border-top-color:#4F8CFF"></div>
+            <div class="w-8 h-8 rounded-full spin mx-auto mb-3" style="border:2px solid var(--border-default);border-top-color:#4F8CFF"></div>
             加载档案中...
           </div>
 
@@ -2268,23 +2344,23 @@
                   <div>
                     <div class="text-xs text-slate-800 mb-1">年级 / 学期</div>
                     <select class="w-full bg-transparent border border-slate-800 rounded px-2 py-1 text-sm text-slate-800 focus:border-blue-500 outline-none"
-                      style="background:#F8F9FC"
+                      style="background:var(--bg-input)"
                       x-model="prof.pref.grade"
                       @change="savePref()">
-                      <option value="" style="background:#F8F9FC">请选择</option>
-                      <optgroup label="小学" style="background:#F8F9FC">
+                      <option value="" style="background:var(--bg-input)">请选择</option>
+                      <optgroup label="小学" style="background:var(--bg-input)">
                         <template x-for="g in ['小学一年级上册','小学一年级下册','小学二年级上册','小学二年级下册','小学三年级上册','小学三年级下册','小学四年级上册','小学四年级下册','小学五年级上册','小学五年级下册','小学六年级上册','小学六年级下册']" :key="g">
-                          <option :value="g" style="background:#F8F9FC" x-text="g"></option>
+                          <option :value="g" style="background:var(--bg-input)" x-text="g"></option>
                         </template>
                       </optgroup>
-                      <optgroup label="初中" style="background:#F8F9FC">
+                      <optgroup label="初中" style="background:var(--bg-input)">
                         <template x-for="g in ['初一上册','初一下册','初二上册','初二下册','初三上册','初三下册']" :key="g">
-                          <option :value="g" style="background:#F8F9FC" x-text="g"></option>
+                          <option :value="g" style="background:var(--bg-input)" x-text="g"></option>
                         </template>
                       </optgroup>
-                      <optgroup label="高中" style="background:#F8F9FC">
+                      <optgroup label="高中" style="background:var(--bg-input)">
                         <template x-for="g in ['高一上册','高一下册','高二上册','高二下册','高三上册','高三下册']" :key="g">
-                          <option :value="g" style="background:#F8F9FC" x-text="g"></option>
+                          <option :value="g" style="background:var(--bg-input)" x-text="g"></option>
                         </template>
                       </optgroup>
                     </select>
@@ -2299,33 +2375,33 @@
                   <div>
                     <div class="text-xs text-slate-800 mb-1">MBTI 性格</div>
                     <select class="w-full bg-transparent border border-slate-800 rounded px-2 py-1 text-sm text-slate-800 focus:border-blue-500 outline-none"
-                      style="background:#F8F9FC"
+                      style="background:var(--bg-input)"
                       x-model="prof.pref.mbti"
                       @change="savePref()">
-                      <option value="" style="background:#F8F9FC">不知道 / 暂不填</option>
-                      <optgroup label="分析家型" style="background:#F8F9FC">
-                        <option value="INTJ" style="background:#F8F9FC">INTJ — 建筑师</option>
-                        <option value="INTP" style="background:#F8F9FC">INTP — 逻辑学家</option>
-                        <option value="ENTJ" style="background:#F8F9FC">ENTJ — 指挥官</option>
-                        <option value="ENTP" style="background:#F8F9FC">ENTP — 辩论家</option>
+                      <option value="" style="background:var(--bg-input)">不知道 / 暂不填</option>
+                      <optgroup label="分析家型" style="background:var(--bg-input)">
+                        <option value="INTJ" style="background:var(--bg-input)">INTJ — 建筑师</option>
+                        <option value="INTP" style="background:var(--bg-input)">INTP — 逻辑学家</option>
+                        <option value="ENTJ" style="background:var(--bg-input)">ENTJ — 指挥官</option>
+                        <option value="ENTP" style="background:var(--bg-input)">ENTP — 辩论家</option>
                       </optgroup>
-                      <optgroup label="外交家型" style="background:#F8F9FC">
-                        <option value="INFJ" style="background:#F8F9FC">INFJ — 提倡者</option>
-                        <option value="INFP" style="background:#F8F9FC">INFP — 调停者</option>
-                        <option value="ENFJ" style="background:#F8F9FC">ENFJ — 主人公</option>
-                        <option value="ENFP" style="background:#F8F9FC">ENFP — 竞选者</option>
+                      <optgroup label="外交家型" style="background:var(--bg-input)">
+                        <option value="INFJ" style="background:var(--bg-input)">INFJ — 提倡者</option>
+                        <option value="INFP" style="background:var(--bg-input)">INFP — 调停者</option>
+                        <option value="ENFJ" style="background:var(--bg-input)">ENFJ — 主人公</option>
+                        <option value="ENFP" style="background:var(--bg-input)">ENFP — 竞选者</option>
                       </optgroup>
-                      <optgroup label="守护者型" style="background:#F8F9FC">
-                        <option value="ISTJ" style="background:#F8F9FC">ISTJ — 物流师</option>
-                        <option value="ISFJ" style="background:#F8F9FC">ISFJ — 守卫者</option>
-                        <option value="ESTJ" style="background:#F8F9FC">ESTJ — 总经理</option>
-                        <option value="ESFJ" style="background:#F8F9FC">ESFJ — 执政官</option>
+                      <optgroup label="守护者型" style="background:var(--bg-input)">
+                        <option value="ISTJ" style="background:var(--bg-input)">ISTJ — 物流师</option>
+                        <option value="ISFJ" style="background:var(--bg-input)">ISFJ — 守卫者</option>
+                        <option value="ESTJ" style="background:var(--bg-input)">ESTJ — 总经理</option>
+                        <option value="ESFJ" style="background:var(--bg-input)">ESFJ — 执政官</option>
                       </optgroup>
-                      <optgroup label="探险家型" style="background:#F8F9FC">
-                        <option value="ISTP" style="background:#F8F9FC">ISTP — 鉴赏家</option>
-                        <option value="ISFP" style="background:#F8F9FC">ISFP — 探险家</option>
-                        <option value="ESTP" style="background:#F8F9FC">ESTP — 企业家</option>
-                        <option value="ESFP" style="background:#F8F9FC">ESFP — 表演者</option>
+                      <optgroup label="探险家型" style="background:var(--bg-input)">
+                        <option value="ISTP" style="background:var(--bg-input)">ISTP — 鉴赏家</option>
+                        <option value="ISFP" style="background:var(--bg-input)">ISFP — 探险家</option>
+                        <option value="ESTP" style="background:var(--bg-input)">ESTP — 企业家</option>
+                        <option value="ESFP" style="background:var(--bg-input)">ESFP — 表演者</option>
                       </optgroup>
                     </select>
                   </div>
@@ -2340,7 +2416,7 @@
               <div class="flex gap-2">
                 <input x-model="apiBase"
                   class="flex-1 px-3 py-2 rounded-lg text-sm outline-none"
-                  style="background:#F8F9FC;border:1px solid #E2E8F0;color:#334155"
+                  style="background:var(--bg-input);border:1px solid var(--border-input);color:var(--text-body)"
                   placeholder="http://localhost:8001"
                   @focus="$el.style.borderColor='#4F8CFF'"
                   @blur="$el.style.borderColor='#E2E8F0'">
@@ -2372,6 +2448,17 @@
                   </div>
                 </div>
                 <div x-show="prof.prefSaved" class="text-xs mt-3" style="color:#10b981">✓ 偏好已保存，下次讲解生效</div>
+              </div>
+            </div>
+
+            <!-- theme settings -->
+            <div class="card p-5">
+              <h3 class="text-xs text-slate-800 uppercase tracking-widest mb-4">🎨 主题设置</h3>
+              <div class="flex gap-3">
+                <button class="pill text-sm flex-1" :class="!darkMode ? 'on' : ''"
+                  @click="if (!darkMode) return; toggleTheme()">☀️ 浅色模式</button>
+                <button class="pill text-sm flex-1" :class="darkMode ? 'on' : ''"
+                  @click="if (darkMode) return; toggleTheme()">🌙 深色模式</button>
               </div>
             </div>
 
@@ -2442,7 +2529,7 @@
                   <template x-for="s in subjects" :key="s.v">
                     <div class="flex items-center gap-3">
                       <span class="text-xs text-slate-800 w-10 flex-shrink-0 text-right" x-text="s.short"></span>
-                      <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:#F0F4FF">
+                      <div class="flex-1 rounded-full h-2 overflow-hidden" style="background:var(--progress-bg)">
                         <div class="h-full rounded-full transition-all duration-700"
                           :style="'width:'+(Math.round((prof.summary?.subject_avg?.[s.v]??0)*100))+'%;background:'+SUBJ_COLORS[s.v]"></div>
                       </div>
@@ -2530,8 +2617,8 @@
         </div>
 
         <!-- ════════ HISTORY ════════ -->
-        <div x-show="page==='history'" x-transition:enter.transition.duration.200ms x-transition:leave.transition.duration.100ms class="fadein flex-1 overflow-y-auto p-4 md:p-8 mob-scroll" style="min-height:0">
-          <div class="space-y-6">
+        <div x-show="page==='history'" x-transition:enter.transition.duration.200ms x-transition:leave.transition.duration.100ms class="fadein">
+          <div class="space-y-5">
 
           <!-- Tab selector -->
           <div class="flex gap-2 mobile-wrap">
@@ -2549,12 +2636,13 @@
             </button>
           </div>
 
+
           <!-- ── Homework history ── -->
           <div x-show="hist.tab==='homework'">
 
             <!-- loading -->
             <div x-show="hist.hw.loading" class="text-center py-12 text-slate-800">
-              <div class="w-7 h-7 rounded-full spin mx-auto mb-3" style="border:2px solid #E8EDF4;border-top-color:#4F8CFF"></div>
+              <div class="w-7 h-7 rounded-full spin mx-auto mb-3" style="border:2px solid var(--border-default);border-top-color:#4F8CFF"></div>
               加载中...
             </div>
 
@@ -2674,7 +2762,7 @@
 
             <!-- loading -->
             <div x-show="hist.chat.loading" class="text-center py-12 text-slate-800">
-              <div class="w-7 h-7 rounded-full spin mx-auto mb-3" style="border:2px solid #E8EDF4;border-top-color:#4F8CFF"></div>
+              <div class="w-7 h-7 rounded-full spin mx-auto mb-3" style="border:2px solid var(--border-default);border-top-color:#4F8CFF"></div>
               加载中...
             </div>
 
@@ -2702,9 +2790,9 @@
                     <template x-for="(msg, i) in (hist.chat.detail.messages||[])" :key="i">
                       <div :class="msg.role==='user' ? 'flex justify-end' : 'flex justify-start'">
                         <div class="max-w-[85%] rounded-xl px-4 py-2.5 text-sm"
-                          :style="msg.role==='user' ? 'background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.25);color:#1E293B' : 'background:#FFFFFF;border:1px solid #E8EDF4;color:#334155'">
+                          :style="msg.role==='user' ? 'background:rgba(79,140,255,.12);border:1px solid rgba(79,140,255,.25);color:var(--text-primary)' : 'background:var(--bg-card);border:1px solid var(--border-default);color:var(--text-body)'">
                           <div x-html="md(msg.content)"></div>
-                          <div class="text-xs mt-1" style="color:#1E293B" x-text="msg.timestamp?.slice(0,16).replace('T',' ')"></div>
+                          <div class="text-xs mt-1" style="color:var(--text-primary)" x-text="msg.timestamp?.slice(0,16).replace('T',' ')"></div>
                         </div>
                       </div>
                     </template>
@@ -2751,7 +2839,7 @@
         <!-- label -->
         <span class="tl" x-text="item.label"></span>
         <!-- badge -->
-        <span class="tb" x-show="item.badge>0" x-text="item.badge"></span>
+        <span class="badge" x-show="item.badge>0" x-text="item.badge"></span>
       </button>
     </template>
   </nav>
@@ -2781,7 +2869,7 @@
 
       <!-- progress bar -->
       <div class="w-full max-w-2xl mb-6">
-        <div class="h-1.5 rounded-full overflow-hidden" style="background:#F0F4FF">
+        <div class="h-1.5 rounded-full overflow-hidden" style="background:var(--progress-bg)">
           <div class="h-full rounded-full transition-all duration-500"
             style="background:#4F8CFF"
             :style="'width:'+((review.idx+1)/review.entries.length*100)+'%'"></div>
@@ -2797,7 +2885,7 @@
             <span class="badge" :class="'b-'+review.entries[review.idx].subject"
               x-text="SUBJ_LABEL[review.entries[review.idx].subject]||review.entries[review.idx].subject"></span>
             <span x-show="review.entries[review.idx].question_type && review.entries[review.idx].question_type!=='unknown'"
-              class="badge" style="background:#F0F4FF;color:#1E293B;border:1px solid #E8EDF4"
+              class="badge" style="background:var(--progress-bg);color:var(--text-primary);border:1px solid var(--border-default)"
               x-text="QTYPE_LABEL[review.entries[review.idx].question_type]||''"></span>
             <span x-show="review.entries[review.idx].mastered"
               class="badge" style="background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.25)">✓ 已掌握</span>
@@ -2842,7 +2930,7 @@
             </div>
             <div x-show="review.entries[review.idx].brief_comment"
               class="px-3 py-2 rounded-lg text-xs"
-              style="background:#F8F9FC;border-left:2px solid rgba(245,158,11,.35);color:#64748b"
+              style="background:var(--bg-input);border-left:2px solid rgba(245,158,11,.35);color:var(--text-secondary)"
               x-text="review.entries[review.idx].brief_comment"></div>
           </div>
         </div>
@@ -2868,7 +2956,7 @@
         </button>
         <button @click="reviewNext()"
           class="px-5 py-2.5 rounded-xl text-sm font-semibold transition-all"
-          style="border:1px solid #E8EDF4;color:#64748b"
+          style="border:1px solid var(--border-default);color:var(--text-secondary)"
           onmouseover="this.style.borderColor='#334155';this.style.color='#94a3b8'"
           onmouseout="this.style.borderColor='#E8EDF4';this.style.color='#64748b'">
           跳过 →
@@ -2958,6 +3046,18 @@
     return out
   }
 
+  function sanitizeHtml(html) {
+    // 移除危险标签和事件处理器，防止 LLM 输出中的 XSS 注入
+    if (!html) return ''
+    return String(html)
+      .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+      .replace(/<script\b[^>]*\/>/gi, '')
+      .replace(/\son\w+\s*=\s*"[^"]*"/gi, '')
+      .replace(/\son\w+\s*=\s*'[^']*'/gi, '')
+      .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '')
+      .replace(/javascript\s*:/gi, 'blocked:')
+  }
+
   function renderMathInMarkdown(text) {
     if (!text) return ''
 
@@ -3001,6 +3101,42 @@
   function app() {
     return {
       page: 'dashboard',
+      // 深色模式
+      darkMode: false,
+      toggleTheme() {
+        this.darkMode = !this.darkMode
+        document.documentElement.classList.toggle('dark', this.darkMode)
+        document.querySelector('meta[name="theme-color"]')
+          ?.setAttribute('content', this.darkMode ? '#0F172A' : '#FFFFFF')
+        localStorage.setItem('studycore_theme', this.darkMode ? 'dark' : 'light')
+        fetch(`${this.apiBase}/api/v1/settings/theme`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ theme: this.darkMode ? 'dark' : 'light' }),
+        }).catch(() => {})
+      },
+      loadTheme() {
+        const stored = localStorage.getItem('studycore_theme')
+        if (stored === 'dark' || stored === 'light') {
+          this.darkMode = stored === 'dark'
+          document.documentElement.classList.toggle('dark', this.darkMode)
+          document.querySelector('meta[name="theme-color"]')
+            ?.setAttribute('content', this.darkMode ? '#0F172A' : '#FFFFFF')
+        }
+        fetch(`${this.apiBase}/api/v1/settings`)
+          .then(r => r.json())
+          .then(data => {
+            const t = data?.ui?.theme
+            if (t && t !== (this.darkMode ? 'dark' : 'light')) {
+              this.darkMode = t === 'dark'
+              document.documentElement.classList.toggle('dark', this.darkMode)
+              document.querySelector('meta[name="theme-color"]')
+                ?.setAttribute('content', this.darkMode ? '#0F172A' : '#FFFFFF')
+              localStorage.setItem('studycore_theme', t)
+            }
+          })
+          .catch(() => {})
+      },
       // 自动用当前域名+端口，手机访问时无需手动改地址
       apiBase: window.location.origin,
       clock: '',               // 实时时钟（每秒更新）
@@ -3406,7 +3542,7 @@
         try {
           const res = await fetch(`${this.apiBase}/api/v1/wrong-book/stats`)
           if (res.ok) { this.wbStats = await res.json(); this.syncNavBadge() }
-        } catch(_) {}
+        } catch(_) { console.warn('Failed to load wrong-book stats') }
       },
 
       syncNavBadge() {
@@ -3417,7 +3553,7 @@
       wbFilter() {
         const f = this.wb.filter
         let filtered
-        // 始终生成新数组（不与 wb.entries 同引用），确保 Alpine.js 响应式检测到变化
+        // 始终生成新数组（不与 this.wb.entries 同引用），确保 Alpine.js 响应式检测到变化
         if (f === 'all')             filtered = [...this.wb.entries]
         else if (f === 'unmastered') filtered = this.wb.entries.filter(e => !e.mastered)
         else if (f === 'mastered')   filtered = this.wb.entries.filter(e => e.mastered)
@@ -3593,7 +3729,7 @@
         activeSessionId: null,  // current session_id (null = new unsaved session)
       },
 
-      get iq.filteredSessions() {
+      get iqFilteredSessions() {
         const q = this.iq.searchText?.trim().toLowerCase();
         if (!q) return this.iq.sessions;
         return this.iq.sessions.filter(s => {
@@ -4154,7 +4290,7 @@
         current_progress: null,
         generated_questions: [],
         userAnswers: {},
-        checked: new Set(),
+        checked: {},  // 用 Object 替代 Set，确保 Alpine 响应式追踪
         generation_history: {
           total: 0,
           records: [],
@@ -4206,9 +4342,9 @@
         // 加载历史出题记录到当前页面
         this.gen.generated_questions = record.questions || []
         this.gen.userAnswers = {}
-        this.gen.checked.clear()
+        this.gen.checked = {}
         // 滚动到结果
-        const el = document.querySelector('[x-show="page===\'generate\'"]')
+        const el = document.querySelector('[x-show="page ===\'generate\'"]')
         if (el) el.scrollIntoView({behavior: 'smooth'})
       },
       async deleteGenerationRecord(id) {
@@ -4229,7 +4365,7 @@
       clearGenerated() {
         this.gen.generated_questions = []
         this.gen.userAnswers = {}
-        this.gen.checked.clear()
+        this.gen.checked = {}
         this.gen.current_progress = null
       },
       getUserAnswer(questionId) {
@@ -4243,10 +4379,10 @@
       },
       checkAnswer(item) {
         const questionId = item.question_id
-        this.gen.checked.add(questionId)
+        this.gen.checked[questionId] = true
       },
       checkDone(questionId) {
-        return this.gen.checked.has(questionId)
+        return !!this.gen.checked[questionId]
       },
       isCorrect(questionId) {
         const question = this.gen.generated_questions.find(
@@ -4262,12 +4398,13 @@
         return false
       },
       get correctRate() {
-        if (this.gen.checked.size === 0) return '0%'
+        const keys = Object.keys(this.gen.checked)
+        if (keys.length === 0) return '0%'
         let correct = 0
-        this.gen.checked.forEach(id => {
+        keys.forEach(id => {
           if (this.isCorrect(id)) correct++
         })
-        return Math.round(correct / this.gen.checked.size * 100) + '%'
+        return Math.round(correct / keys.length * 100) + '%'
       },
       startGenerate() {
         if (!this.gen.knowledge_point.trim()) return
@@ -4288,7 +4425,7 @@
             subject: this.gen.subject,
             knowledge_point: this.gen.knowledge_point,
             num_questions: this.gen.num_questions,
-            difficulty: this.difficulty,
+            difficulty: this.gen.difficulty_value,
             question_type: this.gen.question_type,
           }
           ws.send(JSON.stringify(params))
@@ -4345,13 +4482,16 @@
       /* ─── helpers ─── */
       diffStyle(d) {
         const m = { easy:'background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.25)', medium:'background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.25)', hard:'background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25)', very_hard:'background:rgba(244,114,182,.1);color:#F472B6;border:1px solid rgba(244,114,182,.25)' }
-        return m[d] || 'background:#F0F4FF;color:#1E293B;border:1px solid #E8EDF4'
+        return m[d] || 'background:var(--progress-bg);color:var(--text-primary);border:1px solid var(--border-default)'
       },
       md(text) {
         if (!text) return ''
         const rendered = renderMathInMarkdown(text)
         const fallback = fallbackMathText(text)
-        try { return marked.parse(rendered) } catch(_) { return fallback.replace(/\n/g,'<br>') }
+        try {
+          const html = marked.parse(rendered)
+          return sanitizeHtml(html)
+        } catch(_) { return fallback.replace(/\n/g,'<br>') }
       },
 
       /* ─── navigation ─── */
@@ -4410,7 +4550,7 @@
         try {
           const res = await fetch(`${this.apiBase}/api/v1/history/chat?limit=50`)
           if (res.ok) this.hist.chat.list = await res.json()
-        } catch(_) {}
+        } catch(_) { this.toast('加载聊天历史失败', 'error') }
         this.hist.chat.loading = false
         this.hist.chat.loaded = true
       },
@@ -4418,7 +4558,7 @@
         try {
           const res = await fetch(`${this.apiBase}/api/v1/history/chat/${sessionId}`)
           if (res.ok) this.hist.chat.detail = await res.json()
-        } catch(_) { this.toast('加载详情失败', 'error') }
+        } catch(_) { this.toast('加载聊天详情失败', 'error') }
       },
 
       /* ─── session management (inquire) ─── */
@@ -4437,7 +4577,7 @@
         try {
           const res = await fetch(`${this.apiBase}/api/v1/history/chat?limit=50`)
           if (res.ok) this.iq.sessions = await res.json()
-        } catch(_) {}
+        } catch(_) { this.toast('加载会话列表失败', 'error') }
         this.iq.sessionsLoading = false
       },
 
@@ -4483,7 +4623,7 @@
         try {
           const res = await fetch(`${this.apiBase}/api/v1/history/homework?limit=50`)
           if (res.ok) this.hw.histList = await res.json()
-        } catch(_) {}
+        } catch(_) { this.toast('加载历史批改记录失败', 'error') }
         this.hw.histLoading = false
       },
 
@@ -4520,6 +4660,7 @@
 
       /* ─── init ─── */
       async init() {
+        this.loadTheme()
         // 实时时钟
         const updateClock = () => {
           const d = new Date()
@@ -4551,7 +4692,7 @@
               this.hw.state  = 'done'
             }
           }
-        } catch(_) {}
+        } catch(_) { console.warn('Failed to restore cached homework result') }
 
         // Load data in parallel for faster startup
         await Promise.allSettled([
@@ -4567,7 +4708,7 @@
             this.wb.entries = deduped.map(e => ({ ...e, _explaining:false, _explanation: this.wbExplainCache.get(e.entry_id) || null }))
             this.wbFilter()
           }
-        } catch(_) {}
+        } catch(_) { console.warn('Failed to load wrong-book data on init') }
       },
     }
   }

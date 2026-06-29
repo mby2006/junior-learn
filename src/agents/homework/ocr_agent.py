@@ -121,7 +121,7 @@ class OCRAgent(BaseAgent):
         if parse_model_key:
             parse_kw = _agent_kwargs(parse_model_key)
             if parse_kw:
-                # Create a plain OCRAgent (no parse_model_key to avoid recursion)
+                parse_kw.pop("parse_model_key", None)  # 防止误传导致递归
                 self._parse_agent: "OCRAgent | None" = OCRAgent(**parse_kw)
             else:
                 self._parse_agent = None

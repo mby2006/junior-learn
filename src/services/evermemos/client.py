@@ -47,6 +47,18 @@ class EverMemOSClient:
             "Authorization": f"Bearer {self._api_key}",
             "Content-Type":  "application/json",
         }
+        self._client: Optional[httpx.AsyncClient] = None
+
+    async def _ensure_client(self) -> httpx.AsyncClient:
+        """延迟创建并复用 httpx.AsyncClient，支持连接池复用。"""
+        if self._client is None or self._client.is_closed:
+            self._client = httpx.AsyncClient(timeout=_TIMEOUT)
+        return self._client
+
+    async def close(self) -> None:
+        """关闭 HTTP 客户端，释放连接。"""
+        if self._client and not self._client.is_closed:
+            await self._client.aclose()
 
     # ─────────────────────────────────────────
     # Write — 写入一条消息
@@ -143,10 +155,10 @@ class EverMemOSClient:
     async def _post(self, path: str, payload: dict) -> dict[str, Any]:
         url = f"{self._base_url}{path}"
         try:
-            async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-                resp = await client.post(url, json=payload, headers=self._headers)
-                resp.raise_for_status()
-                return resp.json()
+            client = await self._ensure_client()
+            resp = await client.post(url, json=payload, headers=self._headers)
+            resp.raise_for_status()
+            return resp.json()
         except httpx.HTTPStatusError as e:
             logger.warning(
                 f"[EverMemOS] POST {path} 失败: HTTP {e.response.status_code} "
@@ -160,10 +172,10 @@ class EverMemOSClient:
     async def _get(self, path: str, params: dict) -> dict[str, Any]:
         url = f"{self._base_url}{path}"
         try:
-            async with httpx.AsyncClient(timeout=_TIMEOUT) as client:
-                resp = await client.get(url, params=params, headers=self._headers)
-                resp.raise_for_status()
-                return resp.json()
+            client = await self._ensure_client()
+            resp = await client.get(url, params=params, headers=self._headers)
+            resp.raise_for_status()
+            return resp.json()
         except httpx.HTTPStatusError as e:
             logger.warning(
                 f"[EverMemOS] GET {path} 失败: HTTP {e.response.status_code} "

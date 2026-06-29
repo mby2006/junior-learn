@@ -45,12 +45,9 @@ def _setup_openai_env_vars_early():
     # Only set env vars for OpenAI-compatible bindings
     if binding in ("openai", "azure_openai", "gemini"):
         if api_key and not os.getenv("OPENAI_API_KEY"):
-            os.environ["OPENAI_API_KEY"] = api_key
-            logger.debug("Set OPENAI_API_KEY env var for LightRAG compatibility (early init)")
-
+            os.environ.setdefault("OPENAI_API_KEY", api_key)
         if base_url and not os.getenv("OPENAI_BASE_URL"):
-            os.environ["OPENAI_BASE_URL"] = base_url
-            logger.debug(f"Set OPENAI_BASE_URL env var to {base_url} (early init)")
+            os.environ.setdefault("OPENAI_BASE_URL", base_url)
 
 
 # Execute early setup at module import time

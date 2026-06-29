@@ -388,7 +388,7 @@ async def grade_homework(
         if record_type_key not in {"homework", "exam"}:
             record_type_key = "homework"
 
-        asyncio.create_task(_background_exam_and_memory(
+        task = asyncio.create_task(_background_exam_and_memory(
             graded=graded,
             newly_graded=newly_graded,   # 仅 LLM 批改的题写入题库
             subject_key=subject_key,
@@ -398,6 +398,7 @@ async def grade_homework(
             model_kw=model_kw or {},
             known_weak_points=known_weak_points,
         ))
+        task.add_done_callback(_log_bg_task_error)
 
         return result
 
@@ -411,6 +412,15 @@ async def grade_homework(
 # ─────────────────────────────────────────────────────────────────────────────
 # 后台任务：ExamTag + 记忆系统（不阻塞批改响应）
 # ─────────────────────────────────────────────────────────────────────────────
+
+def _log_bg_task_error(task: asyncio.Task) -> None:
+    """记录后台任务中未被内部 try/except 捕获的异常。"""
+    try:
+        exc = task.exception()
+        if exc:
+            logger.error(f"后台任务异常: {exc}", exc_info=exc)
+    except (asyncio.CancelledError, asyncio.InvalidStateError):
+        pass
 
 async def _save_homework_history(result: "HomeworkResult") -> None:
     """将完整批改结果持久化到 data/history/homework/{id}.json。"""

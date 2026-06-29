@@ -57,9 +57,11 @@ def get_question_bank() -> QuestionBankService:
 
 # ── 数据存储：出题历史 ───────────────────────────────────────────────────────────
 _generation_history_path = _project_root / "data" / "generation_history.json"
+_gen_history_lock = asyncio.Lock()  # 并发保护读-改-写
+
 
 def _load_generation_history() -> dict[str, Any]:
-    """加载出题历史。"""
+    """加载出题历史（内部使用，不加锁）。"""
     if not _generation_history_path.exists():
         return {"version": 1, "records": []}
     try:
@@ -67,28 +69,32 @@ def _load_generation_history() -> dict[str, Any]:
     except Exception:
         return {"version": 1, "records": []}
 
-def _save_generation_record(record: dict[str, Any]) -> None:
-    """保存出题记录。"""
-    data = _load_generation_history()
-    data["records"].insert(0, record)  # 新记录插在前面
-    _generation_history_path.parent.mkdir(parents=True, exist_ok=True)
-    _generation_history_path.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
 
-def _delete_generation_record(record_id: str) -> bool:
-    """删除出题记录。"""
-    data = _load_generation_history()
-    original_len = len(data["records"])
-    data["records"] = [r for r in data["records"] if r.get("id") != record_id]
-    if len(data["records"]) == original_len:
-        return False
-    _generation_history_path.write_text(
-        json.dumps(data, ensure_ascii=False, indent=2),
-        encoding="utf-8"
-    )
-    return True
+async def _save_generation_record(record: dict[str, Any]) -> None:
+    """保存出题记录（并发安全）。"""
+    async with _gen_history_lock:
+        data = _load_generation_history()
+        data["records"].insert(0, record)
+        _generation_history_path.parent.mkdir(parents=True, exist_ok=True)
+        _generation_history_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+
+async def _delete_generation_record(record_id: str) -> bool:
+    """删除出题记录（并发安全）。"""
+    async with _gen_history_lock:
+        data = _load_generation_history()
+        original_len = len(data["records"])
+        data["records"] = [r for r in data["records"] if r.get("id") != record_id]
+        if len(data["records"]) == original_len:
+            return False
+        _generation_history_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        return True
 
 # ── 请求体定义 ───────────────────────────────────────────────────────────────────
 
@@ -189,7 +195,7 @@ async def get_generation_detail(generation_id: str):
 @router.delete("/history/{generation_id}", summary="删除出题记录")
 async def delete_generation_record(generation_id: str):
     """删除出题记录。"""
-    success = _delete_generation_record(generation_id)
+    success = await _delete_generation_record(generation_id)
     if not success:
         raise HTTPException(status_code=404, detail="记录不存在")
     return {"success": True}
@@ -313,6 +319,17 @@ async def websocket_generate(websocket: WebSocket):
                 }
 
                 # 批量生成
+                # 预加载所有题库到内存，避免循环内重复读文件
+                all_entries: dict[str, dict] = {}
+                data_dir = _project_root / "data" / "question_bank"
+                if data_dir.exists():
+                    for json_file in data_dir.glob("*.json"):
+                        try:
+                            bank_data = json.loads(json_file.read_text(encoding="utf-8"))
+                            all_entries.update(bank_data.get("entries", {}))
+                        except Exception:
+                            continue
+
                 result = {
                     "success": True,
                     "requested": len(question_ids),
@@ -322,24 +339,8 @@ async def websocket_generate(websocket: WebSocket):
                 }
 
                 for qid in question_ids:
-                    # 从 question_bank 获取原题
-                    bank = get_question_bank()
-                    # 需要从对应科目文件中找到这个题
-                    # 先尝试从所有题库搜索
-                    found = False
-                    original_question: Optional[dict] = None
-                    data_dir = _project_root / "data" / "question_bank"
-                    if data_dir.exists():
-                        for json_file in data_dir.glob("*.json"):
-                            try:
-                                bank_data = json.loads(json_file.read_text(encoding="utf-8"))
-                                if qid in bank_data.get("entries", {}):
-                                    original_question = bank_data["entries"][qid]
-                                    found = True
-                                    break
-                            except Exception:
-                                continue
-                    if not found or not original_question:
+                    original_question: Optional[dict] = all_entries.get(qid)
+                    if not original_question:
                         result["failed"] += 1
                         continue
 
@@ -398,7 +399,7 @@ async def websocket_generate(websocket: WebSocket):
                         for r in result.get("results", [])
                     ],
                 }
-                _save_generation_record(record)
+                await _save_generation_record(record)
                 logger.info(f"Generation saved to history: {record_id}")
 
                 # 发送完成消息（包含完整结果给前端渲染）

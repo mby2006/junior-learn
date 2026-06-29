@@ -564,14 +564,12 @@ class UnifiedConfigManager:
             base_url = config.get("base_url", "")
 
             # Only set env vars for OpenAI-compatible providers
+            # Use setdefault to avoid overwriting user-set env vars
             if provider in ("openai", "azure_openai", "gemini", "deepseek"):
                 if api_key:
-                    os.environ["OPENAI_API_KEY"] = api_key
-                    logger.debug("Updated OPENAI_API_KEY env var for LightRAG compatibility")
-
+                    os.environ.setdefault("OPENAI_API_KEY", api_key)
                 if base_url:
-                    os.environ["OPENAI_BASE_URL"] = base_url
-                    logger.debug(f"Updated OPENAI_BASE_URL env var to {base_url}")
+                    os.environ.setdefault("OPENAI_BASE_URL", base_url)
 
             # Reset LLM client singleton to pick up new configuration
             try:

@@ -68,6 +68,13 @@ def get_mem_service() -> MemoryService:
     return _mem_service
 
 
+_SUBJECT_CN_MAP: dict[str, str] = {
+    "math": "数学", "physics": "物理", "chemistry": "化学",
+    "english": "英语", "biology": "生物", "history": "历史", "chinese": "语文",
+    "politics": "政治", "geography": "地理",
+}
+
+
 # ── 公开的简化请求体（仅主动询问模式使用）──────────────────────────────────
 
 class QuestionInquiryRequest(BaseModel):
@@ -401,12 +408,6 @@ async def ask_question(body: QuestionInquiryRequest):
 
 # ── Vision 解题端点（图片直接传给 LLM，绕过 OCR 中间层）─────────────────────
 
-_SUBJECT_CN_MAP: dict[str, str] = {
-    "math": "数学", "physics": "物理", "chemistry": "化学",
-    "english": "英语", "biology": "生物", "history": "历史", "chinese": "语文",
-    "politics": "政治", "geography": "地理",
-}
-
 @router.post("/with-image", response_model=ExplainResponse)
 async def ask_question_with_image(
     image:         UploadFile        = File(..., description="图片文件（JPG/PNG/WEBP/HEIC）"),
@@ -679,17 +680,11 @@ async def _extract_image_text(image_bytes: bytes, content_type: str, subject: st
 
     try:
         agent = get_explain_agent()
-        # 直接使用 BaseAgent 的底层 LLM 客户端
-        result = await agent._llm_client.chat(messages=messages)  # type: ignore[attr-defined]
-        if isinstance(result, dict):
-            return result.get("content") or result.get("text") or str(result)
-        return str(result)
-    except AttributeError:
-        # 如果 _llm_client 不可直接访问，回退到 call_llm（纯文字提示）
-        agent = get_explain_agent()
-        return await agent.call_llm(
-            user_prompt=f"[图片 base64 略，题目科目：{subj_cn}]\n请根据科目提示描述一个典型{subj_cn}题目（OCR 功能需视觉 LLM 支持）",
+        result = await agent.call_llm(
+            user_prompt="",  # 图片模式下 messages 已包含所有内容
             system_prompt=system_prompt,
+            messages=messages,
         )
+        return result
     except Exception as exc:
         raise HTTPException(status_code=500, detail=f"图片识别失败：{exc}")
